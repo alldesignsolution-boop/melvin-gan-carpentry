@@ -64,7 +64,7 @@ class QuotePDF(FPDF):
         self.set_y(-14)
         self.set_font("Helvetica", "I", 8)
         self.set_text_color(*GRAY)
-        self.cell(0, 5, _safe("Melvin Gan Carpentry  •  RESIDENTIAL DESIGN & BUILD"), align="C",
+        self.cell(0, 5, _safe("Melvin Gan Carpentry  •  DIRECT MANUFACTURING PRICE FOR CARPENTRY WORKS"), align="C",
                   new_x=XPos.LMARGIN, new_y=YPos.NEXT)
 
     def section_header(self, title):

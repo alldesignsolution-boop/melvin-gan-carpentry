@@ -47,8 +47,8 @@ def init_db():
     # Ensure admin user exists (create or update password)
     db = SessionLocal()
     try:
-        admin_user = os.getenv("ADMIN_USER", "melvin")
-        admin_pass = os.getenv("ADMIN_PASS", "hoga@2026")
+        admin_user = os.getenv("ADMIN_USER", "Melvin")
+        admin_pass = os.getenv("ADMIN_PASS", "MGCW26")
         pw_hash = hashlib.sha256(admin_pass.encode()).hexdigest()
         user = db.query(User).filter(User.username == admin_user).first()
         if user:
@@ -58,7 +58,7 @@ def init_db():
             db.add(User(
                 username=admin_user,
                 password_hash=pw_hash,
-                full_name="Admin",
+                full_name="Melvin",
                 role="admin",
             ))
         db.commit()
