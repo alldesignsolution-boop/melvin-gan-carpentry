@@ -52,10 +52,10 @@ class QuotePDF(FPDF):
         self.cell(90, 8, self.doc_type, align="R", new_x=XPos.LMARGIN, new_y=YPos.TOP)
         self.set_font("Helvetica", "", 7.5)
         self.set_xy(106, 16)
-        self.cell(90, 4, _safe("Payment Details: MORDEZ SDN BHD"), align="R",
+        self.cell(90, 4, _safe("Payment Details: DIVINE ASSENCE SDN BHD"), align="R",
                   new_x=XPos.LMARGIN, new_y=YPos.TOP)
         self.set_xy(106, 20)
-        self.cell(90, 4, _safe("Bank: MAYBANK (A/C: 5643 9720 3875)"), align="R",
+        self.cell(90, 4, _safe("Bank: MAYBANK (A/C: )"), align="R",
                   new_x=XPos.LMARGIN, new_y=YPos.TOP)
         self.set_text_color(0, 0, 0)
         self.set_y(38)
