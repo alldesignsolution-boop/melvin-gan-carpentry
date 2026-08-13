@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Melvin Gan Carpentry — Lead Detail</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@200&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f6fa; color: #1a1a2e; }
+  nav { background: #f0ebe1; padding: 16px 32px; display: flex; align-items: center; gap: 24px; }
+  .nav-logo { font-family: 'Raleway', sans-serif; font-weight: 200; font-size: 19px; letter-spacing: 4px; color: #1a1a2e; white-space: nowrap; flex-shrink: 0; text-decoration: none; }
+  nav a { color: #7a6352; text-decoration: none; font-size: 14px; }
+  nav a:hover { color: #1a1a2e; }
+  nav .spacer { flex: 1; }
+  nav button.logout { background: none; border: 1px solid #c9b9a5; color: #7a6352; padding: 4px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+  nav button.logout:hover { border-color: #8a7060; color: #1a1a2e; }
+  .main { padding: 32px; max-width: 900px; margin: 0 auto; }
+  .back { font-size: 13px; color: #4a3b30; text-decoration: none; display: inline-block; margin-bottom: 20px; }
+  .back:hover { text-decoration: underline; }
+  .grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
+  .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,.06); margin-bottom: 20px; }
+  .card h2 { font-size: 13px; font-weight: 600; color: #555; margin-bottom: 16px; text-transform: uppercase; letter-spacing: .5px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .fg { display: flex; flex-direction: column; margin-bottom: 14px; }
+  .fg label { font-size: 11px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 4px; }
+  .fg input, .fg select, .fg textarea { padding: 9px 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; font-family: inherit; background: white; }
+  .fg textarea { min-height: 80px; resize: vertical; }
+  .fg .static { font-size: 13px; color: #555; padding: 6px 0; }
+  button.primary { background: #4a3b30; color: white; border: none; padding: 9px 18px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
+  button.primary:hover { background: #33291f; }
+  .badge { display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 12px; }
+  .badge-new{background:#dbeafe;color:#1d4ed8} .badge-contacted{background:#fef3c7;color:#b45309}
+  .badge-site_visit{background:#fce7f3;color:#9d174d} .badge-quoted{background:#f0ebe1;color:#4a3b30}
+  .badge-negotiating{background:#ffedd5;color:#c2410c} .badge-won{background:#d1fae5;color:#065f46}
+  .badge-lost{background:#fee2e2;color:#991b1b}
+  .status-select { width: 100%; padding: 10px 12px; border: 2px solid #4a3b30; border-radius: 8px; font-size: 14px; font-weight: 600; color: #4a3b30; cursor: pointer; background: white; margin-bottom: 10px; }
+  #lost-reason-row { display: none; margin-bottom: 10px; }
+  #lost-reason-row select { width: 100%; padding: 9px 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; background: white; }
+  .log-item { padding: 10px 0; border-bottom: 1px solid #f0f0f5; font-size: 13px; }
+  .log-item:last-child { border-bottom: none; }
+  .log-time { font-size: 11px; color: #aaa; margin-top: 2px; }
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #10b981; color: white; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; display: none; z-index: 100; }
+  .toast.error { background: #ef4444; }
+  @media(max-width:700px){.grid{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}}
+
+  @media(max-width:640px){
+    nav { padding: 8px 14px; gap: 8px; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+    nav::-webkit-scrollbar { display: none; }
+    .nav-logo { font-size: 15px; letter-spacing: 3px; }
+    nav a { font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+    nav .spacer { display: none; }
+    nav button.logout { white-space: nowrap; flex-shrink: 0; font-size: 11px; padding: 4px 8px; }
+    .main { padding: 12px; }
+    .card { padding: 16px 12px; }
+  }
+
+  .qt-row { display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-bottom:1px solid #f0f0f5; font-size:13px; }
+  .qt-row:last-child { border-bottom:none; }
+  .qt-badge{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:600}
+  .qt-badge-draft{background:#f3f4f6;color:#374151}.qt-badge-sent{background:#dbeafe;color:#1d4ed8}
+  .qt-badge-accepted{background:#d1fae5;color:#065f46}.qt-badge-rejected{background:#fee2e2;color:#991b1b}
+  .qt-badge-negotiating{background:#ffedd5;color:#c2410c}
+  .type-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 0; }
+  .type-chip { display: inline-flex; align-items: center; }
+  .type-chip input[type=checkbox] { display: none; }
+  .type-chip label { padding: 6px 12px; border: 1.5px solid #e5e7eb; border-radius: 20px; font-size: 12px; font-weight: 600; color: #555; cursor: pointer; transition: all .15s; user-select: none; }
+  .type-chip label:hover { border-color: #8a7364; color: #4a3b30; }
+  .type-chip input:checked + label { border-color: #4a3b30; background: #f0ebe1; color: #4a3b30; }
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">melvin gan carpentry</a>
+  <a href="/">Dashboard</a>
+  <a href="/leads-page">All Leads</a>
+  <a href="/quotes-page">Quotations</a>
+  <a href="/checklists-page">Checklists</a>
+  <a href="/admin/presets">Library</a>
+  <div class="spacer"></div>
+  <form method="POST" action="/logout" style="margin:0">
+    <button class="logout" type="submit">Sign out</button>
+  </form>
+</nav>
+
+<div class="main">
+  <a href="/leads-page" class="back">← Back to Leads</a>
+
+  <div class="grid">
+    <!-- Left -->
+    <div>
+      <div class="card">
+        <h2>Lead Info</h2>
+        <div class="form-row">
+          <div class="fg"><label>Name</label><input id="f-name" type="text"></div>
+          <div class="fg viewer-hide"><label>WhatsApp / Phone</label><input id="f-phone" type="text"></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Email</label><input id="f-email" type="text"></div>
+          <div class="fg viewer-hide"><label>Budget</label><input id="f-budget" type="text"></div>
+        </div>
+        <div class="form-row">
+          <div class="fg">
+            <label>Source Channel</label>
+            <select id="f-source">
+              <option value="">— None —</option>
+              <option value="fb_ads">FB Ads</option>
+              <option value="tiktok_ads">TikTok Ads</option>
+              <option value="referral">Referral</option>
+              <option value="website">Website</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Appointment Location</label>
+            <select id="f-area">
+              <option value="">— None —</option>
+              <option value="sv_selangor">Site Visit, Selangor</option>
+              <option value="sv_kl">Site Visit, KL</option>
+              <option value="sv_border">Site Visit, Border</option>
+              <option value="office">Office</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="fg">
+            <label>Project Type</label>
+            <div class="type-chips" id="f-type-wrap">
+              <span class="type-chip"><input type="checkbox" id="pt-hmv" value="Home Make Over"><label for="pt-hmv">Home Make Over</label></span>
+              <span class="type-chip"><input type="checkbox" id="pt-kit" value="Kitchen"><label for="pt-kit">Kitchen</label></span>
+              <span class="type-chip"><input type="checkbox" id="pt-wet" value="Wetworks"><label for="pt-wet">Wetworks</label></span>
+              <span class="type-chip"><input type="checkbox" id="pt-cab" value="Cabinetry"><label for="pt-cab">Cabinetry</label></span>
+            </div>
+          </div>
+        </div>
+        <div class="fg"><label>Location / Property</label><input id="f-location" type="text"></div>
+        <div class="fg"><label>Assigned To</label><input id="f-assigned" type="text"></div>
+        <div class="fg"><label>Scope / Notes</label><textarea id="f-notes"></textarea></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button class="primary viewer-hide" onclick="saveInfo()">Save Changes</button>
+          <button class="viewer-hide" onclick="deleteLead()"
+                  style="background:none;color:#ef4444;border:1px solid #fecaca;padding:11px 22px;border-radius:8px;font-size:14px;cursor:pointer;font-weight:600">
+            ✕ Delete Lead
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <h2 style="margin:0">Quotations</h2>
+          <button class="primary viewer-hide" onclick="newQuote()">+ New Quotation</button>
+        </div>
+        <div id="quotes-list"><span style="color:#aaa;font-size:13px">Loading…</span></div>
+        <div class="viewer-hide" style="margin-top:14px;padding-top:14px;border-top:1px solid #f0f0f5">
+          <div class="fg" style="margin-bottom:0">
+            <label>Link Existing Quotation</label>
+            <div style="display:flex;gap:8px">
+              <input id="f-link-quote" type="text" placeholder="e.g. QT2026-0001" style="flex:1">
+              <button class="primary" onclick="linkQuote()" style="white-space:nowrap">Link</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right -->
+    <div>
+      <div class="card" style="display:none">
+        <h2>Pipeline Status</h2>
+        <div id="current-badge"></div>
+        <select class="status-select viewer-hide" id="new-status" onchange="onStatusChange()">
+          <option value="new">New Lead</option>
+          <option value="contacted">Contacted</option>
+          <option value="site_visit">Site Visit Scheduled</option>
+          <option value="quoted">Quotation Sent</option>
+          <option value="negotiating">Negotiating</option>
+          <option value="won">Won ✓</option>
+          <option value="lost">Lost ✗</option>
+        </select>
+        <div id="lost-reason-row">
+          <select id="lost-reason">
+            <option value="">— Reason (required) —</option>
+            <option value="price_too_high">Price Too High</option>
+            <option value="chose_competitor">Chose Competitor</option>
+            <option value="project_cancelled">Project Cancelled</option>
+            <option value="no_response">No Response (ghosted)</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="fg"><label>Note (optional)</label><input id="status-note" type="text" placeholder="e.g. Called, waiting reply"></div>
+        <button class="primary viewer-hide" style="width:100%" onclick="updateStatus()">Update Status</button>
+      </div>
+
+      <div class="card">
+        <h2>Details</h2>
+        <div class="fg"><label>Last Follow-up</label><input id="f-followup" type="datetime-local" step="1800"></div>
+        <div class="fg"><label>Follow-up Notes</label><textarea id="f-followup-note" placeholder="e.g. Called — asked to WhatsApp the quote" style="min-height:56px"></textarea></div>
+        <button class="primary viewer-hide" style="width:100%;margin-bottom:16px" onclick="saveFollowUp()">Save Follow-up</button>
+        <div class="fg"><label>Site Visit Appointment</label>
+          <div style="display:flex;gap:8px">
+            <input id="f-appt-date" type="date" style="flex:1">
+            <select id="f-appt-time" style="flex:1"><option value="">— Time —</option></select>
+          </div>
+        </div>
+        <button class="primary viewer-hide" style="width:100%;background:#f97316" onclick="saveAppt()">Save Appointment</button>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <h2 style="margin:0">Checklists</h2>
+          <a id="cl-open-all" href="#" style="font-size:12px;color:#4a3b30;text-decoration:none">Open in Checklists →</a>
+        </div>
+        <div id="cl-list"><span style="color:#aaa;font-size:13px">Loading…</span></div>
+        <div class="viewer-hide" style="display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid #f0f0f5">
+          <input id="cl-new-title" type="text" placeholder="New checklist title" style="flex:1">
+          <button class="primary" onclick="addLeadChecklist()" style="white-space:nowrap">+ Add</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Status History</h2>
+        <div id="logs-list"><span style="color:#aaa;font-size:13px">Loading…</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SL = {new:'New Lead',contacted:'Contacted',site_visit:'Site Visit',quoted:'Quoted',negotiating:'Negotiating',won:'Won',lost:'Lost',follow_up:'Follow-up'};
+const leadId = parseInt(window.location.pathname.split('/').pop());
+let currentStatus = '';
+
+// Fixed 30-minute appointment slots (00:00 → 23:30)
+(function buildApptSlots() {
+  const sel = document.getElementById('f-appt-time');
+  for (let h = 0; h < 24; h++) {
+    for (const m of ['00', '30']) {
+      const val = String(h).padStart(2, '0') + ':' + m;   // 24h value, e.g. "14:30"
+      const hr12 = ((h % 12) || 12);
+      const label = hr12 + ':' + m + ' ' + (h < 12 ? 'AM' : 'PM'); // display, e.g. "2:30 PM"
+      sel.add(new Option(label, val));
+    }
+  }
+})();
+
+async function load() {
+  const [lead, logs] = await Promise.all([
+    fetch('/leads/' + leadId).then(r => r.json()),
+    fetch('/leads/' + leadId + '/logs').then(r => r.json()),
+  ]);
+
+  document.getElementById('f-name').value     = lead.full_name || '';
+  document.getElementById('f-phone').value    = lead.phone || '';
+  document.getElementById('f-email').value    = lead.email || '';
+  document.getElementById('f-budget').value   = lead.budget || '';
+  document.getElementById('f-location').value = lead.location || '';
+  document.getElementById('f-assigned').value = lead.assigned_to || '';
+  document.getElementById('f-notes').value    = lead.request_notes || '';
+  document.getElementById('f-source').value   = lead.source_channel || '';
+  const areaSel = document.getElementById('f-area');
+  // legacy values (pj/kl/border) are migrated to office server-side; map here too just in case
+  const areaVal = ['pj', 'kl', 'border'].includes(lead.area) ? 'office' : (lead.area || '');
+  if (areaVal && ![...areaSel.options].some(o => o.value === areaVal)) {
+    // unknown value — keep it selectable so saving doesn't wipe it
+    areaSel.add(new Option(areaVal, areaVal));
+  }
+  areaSel.value = areaVal;
+  const ptypes = (lead.project_type || '').split(',').map(s => s.trim());
+  document.querySelectorAll('#f-type-wrap input[type=checkbox]').forEach(cb => { cb.checked = ptypes.includes(cb.value); });
+
+  if (lead.appointment_at) {
+    document.getElementById('f-appt-date').value = lead.appointment_at.slice(0, 10);   // YYYY-MM-DD
+    document.getElementById('f-appt-time').value = lead.appointment_at.slice(11, 16);  // HH:MM (snaps to slot)
+  }
+  if (lead.last_follow_up) {
+    document.getElementById('f-followup').value = lead.last_follow_up.slice(0, 16);
+  }
+  document.getElementById('f-followup-note').value = lead.follow_up_note || '';
+
+  currentStatus = lead.status;
+  document.getElementById('current-badge').innerHTML = `<span class="badge badge-${lead.status}">${SL[lead.status]||lead.status}</span>`;
+  document.getElementById('new-status').value = lead.status;
+  onStatusChange();
+
+  const reversed = [...logs].reverse();
+  document.getElementById('logs-list').innerHTML = reversed.length === 0
+    ? '<span style="color:#aaa;font-size:13px">No history yet.</span>'
+    : reversed.map(log => `
+        <div class="log-item">
+          ${log.from_status ? `<span style="color:#999">${SL[log.from_status]||log.from_status} → </span>` : ''}
+          <strong>${SL[log.to_status]||log.to_status}</strong>
+          ${log.note ? `<span style="color:#888"> — ${esc(log.note)}</span>` : ''}
+          <div class="log-time">${fmtDate(log.changed_at)}</div>
+        </div>`).join('');
+}
+
+function onStatusChange() {
+  const s = document.getElementById('new-status').value;
+  document.getElementById('lost-reason-row').style.display = s === 'lost' ? 'block' : 'none';
+}
+
+async function deleteLead() {
+  const name = document.getElementById('f-name').value.trim() || 'this lead';
+  if (!confirm(`Delete "${name}"?\n\nAny linked quotations will be kept but detached.`)) return;
+  const res = await fetch('/leads/' + leadId, { method: 'DELETE' });
+  if (res.ok) {
+    showToast('Lead deleted ✓');
+    setTimeout(() => window.location.href = '/leads-page', 800);
+  } else {
+    showToast('Delete failed', true);
+  }
+}
+
+async function saveInfo() {
+  const body = {
+    full_name:      document.getElementById('f-name').value.trim(),
+    phone:          document.getElementById('f-phone').value.trim()||null,
+    email:          document.getElementById('f-email').value.trim()||null,
+    location:       document.getElementById('f-location').value.trim()||null,
+    budget:         document.getElementById('f-budget').value.trim()||null,
+    assigned_to:    document.getElementById('f-assigned').value.trim()||null,
+    request_notes:  document.getElementById('f-notes').value.trim()||null,
+    source_channel: document.getElementById('f-source').value||null,
+    area:           document.getElementById('f-area').value||null,
+    project_type:   Array.from(document.querySelectorAll('#f-type-wrap input:checked')).map(cb=>cb.value).join(',')||null,
+  };
+  const res = await fetch('/leads/' + leadId, {
+    method: 'PATCH', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body),
+  });
+  res.ok ? showToast('Saved ✓') : showToast('Error saving', true);
+}
+
+async function saveAppt() {
+  const date = document.getElementById('f-appt-date').value;
+  const time = document.getElementById('f-appt-time').value;
+  let val = null;
+  if (date && time) {
+    val = date + 'T' + time;
+  } else if (date || time) {
+    showToast('Pick both a date and a time', true);
+    return;
+  }
+  const res = await fetch('/leads/' + leadId, {
+    method: 'PATCH', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ appointment_at: val }),
+  });
+  res.ok ? showToast('Appointment saved ✓') : showToast('Error', true);
+}
+
+async function saveFollowUp() {
+  const val = document.getElementById('f-followup').value;
+  if (!val) { showToast('Pick a date first', true); return; }
+  const note = document.getElementById('f-followup-note').value.trim();
+  const res = await fetch('/leads/' + leadId, {
+    method: 'PATCH', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ last_follow_up: val, follow_up_note: note || null }),
+  });
+  res.ok ? showToast('Follow-up saved ✓') : showToast('Error', true);
+}
+
+async function updateStatus() {
+  const newStatus = document.getElementById('new-status').value;
+  if (newStatus === currentStatus) { showToast('Status unchanged', true); return; }
+  const lostReason = document.getElementById('lost-reason').value;
+  if (newStatus === 'lost' && !lostReason) { showToast('Please select a lost reason', true); return; }
+  const note = document.getElementById('status-note').value.trim();
+  const res = await fetch('/leads/' + leadId + '/status', {
+    method: 'PATCH', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ status: newStatus, note: note||null, lost_reason: lostReason||null }),
+  });
+  if (res.ok) {
+    document.getElementById('status-note').value = '';
+    document.getElementById('lost-reason').value = '';
+    showToast('Status updated ✓');
+    load();
+  } else {
+    const e = await res.json();
+    showToast(e.detail || 'Error', true);
+  }
+}
+
+function showToast(msg, isError=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 2800);
+}
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtDate(s) {
+  if (!s) return '—';
+  return new Date(s).toLocaleString('en-MY', {day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+
+async function loadQuotes() {
+  const quotes = await fetch('/quotes?lead_id=' + leadId).then(r => r.json());
+  const el = document.getElementById('quotes-list');
+  if (!quotes.length) {
+    el.innerHTML = '<span style="color:#aaa;font-size:13px">No quotations yet.</span>';
+  } else {
+    el.innerHTML = quotes.map(q => `
+      <div class="qt-row">
+        <div>
+          <a href="/quote/${q.id}" style="font-weight:600;color:#4a3b30;text-decoration:none">${esc(q.quote_number)}</a>
+          <span class="qt-badge qt-badge-${q.status}" style="margin-left:8px">${q.status}</span>
+          ${q.is_locked ? '<span style="font-size:11px;color:#888;margin-left:6px">🔒 Proforma</span>' : ''}
+        </div>
+        <div style="text-align:right">
+          <div style="font-weight:700">RM ${fmt(q.total)}</div>
+          <div style="font-size:11px;color:#aaa">${fmtDate(q.created_at)}</div>
+        </div>
+      </div>`).join('');
+  }
+}
+
+function newQuote() {
+  window.location.href = '/new-quote?lead_id=' + leadId;
+}
+
+function fmt(n) { return Number(n||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,","); }
+
+async function linkQuote() {
+  const quoteNumber = document.getElementById('f-link-quote').value.trim();
+  if (!quoteNumber) { showToast('Enter a quotation number', true); return; }
+  // Search all quotes by number (admin sees all; sales sees own)
+  const allQuotes = await fetch('/quotes').then(r => r.json());
+  const found = allQuotes.find(q => q.quote_number.toLowerCase() === quoteNumber.toLowerCase());
+  if (!found) { showToast('Quotation not found: ' + quoteNumber, true); return; }
+  // Sync both directions: lead.quote_id (text) and quote.lead_id (FK)
+  const [r1, r2] = await Promise.all([
+    fetch('/leads/' + leadId, {
+      method: 'PATCH', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ quote_id: found.quote_number }),
+    }),
+    fetch('/quotes/' + found.id + '/link-lead', {
+      method: 'PATCH', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ lead_id: leadId }),
+    }),
+  ]);
+  if (r1.ok && r2.ok) {
+    document.getElementById('f-link-quote').value = '';
+    showToast('Quotation linked ✓');
+    loadQuotes();
+  } else {
+    showToast('Failed to link', true);
+  }
+}
+
+async function loadChecklists() {
+  document.getElementById('cl-open-all').href = '/checklists-page?lead_id=' + leadId;
+  let lists;
+  try { lists = await fetch('/checklists?lead_id=' + leadId).then(r => r.json()); }
+  catch(e) { return; }
+  const el = document.getElementById('cl-list');
+  if (!lists.length) {
+    el.innerHTML = '<span style="color:#aaa;font-size:13px">No checklists linked to this lead.</span>';
+    return;
+  }
+  const dis = window.__viewer;
+  el.innerHTML = lists.map(c => {
+    const total = c.items.length, done = c.items.filter(i => i.done).length;
+    const rows = c.items.map(i => `
+      <div style="display:flex;align-items:flex-start;gap:8px;padding:3px 0">
+        <span onclick="${dis?'':`clToggle(${i.id},${!i.done})`}" style="width:16px;height:16px;flex-shrink:0;margin-top:1px;border:1.6px solid ${i.done?'#7a6352':'#c9b9a5'};background:${i.done?'#7a6352':'#fff'};border-radius:4px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:10px;cursor:${dis?'default':'pointer'}">${i.done?'✓':''}</span>
+        <span style="font-size:13px;line-height:1.35;${i.done?'color:#a99e8f;text-decoration:line-through':''}">${esc(i.text)}</span>
+      </div>`).join('');
+    return `<div style="margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <a href="/checklists-page?lead_id=${leadId}" style="font-weight:600;font-size:14px;color:#1a1a2e;text-decoration:none">${esc(c.title) || '(untitled)'}</a>
+        <span style="font-size:11px;color:#8a7364;background:#f0ebe1;padding:2px 8px;border-radius:10px">${done}/${total}</span>
+      </div>
+      ${rows}
+    </div>`;
+  }).join('');
+}
+async function clToggle(itemId, val) {
+  try {
+    await fetch('/checklists/items/' + itemId, {
+      method: 'PATCH', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ done: val }),
+    });
+    loadChecklists();
+  } catch(e) { showToast('Save failed', true); }
+}
+async function addLeadChecklist() {
+  const title = document.getElementById('cl-new-title').value.trim();
+  if (!title) { showToast('Enter a checklist title', true); return; }
+  try {
+    await fetch('/checklists', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ title, lead_id: leadId }),
+    });
+    document.getElementById('cl-new-title').value = '';
+    showToast('Checklist added ✓');
+    loadChecklists();
+  } catch(e) { showToast('Could not add checklist', true); }
+}
+
+load();
+loadQuotes();
+loadChecklists();
+</script>
+<script>
+(async()=>{
+  try{
+    const me=await fetch('/me').then(r=>r.json());
+    window.__viewer=me.role==='viewer';
+    if(window.__viewer){
+      document.querySelectorAll('.viewer-hide').forEach(el=>el.style.display='none');
+      const sp=document.querySelector('nav .spacer');
+      if(sp){const b=document.createElement('span');b.textContent='View Only';b.style.cssText='background:#fef3c7;color:#b45309;font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;white-space:nowrap';sp.after(b);}
+    }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>

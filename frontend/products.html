@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Melvin Gan Carpentry — Products</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@200&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f6fa; color: #1a1a2e; }
+  nav { background: #f0ebe1; padding: 16px 32px; display: flex; align-items: center; gap: 24px; }
+  .nav-logo { font-family: 'Raleway', sans-serif; font-weight: 200; font-size: 19px; letter-spacing: 4px; color: #1a1a2e; white-space: nowrap; flex-shrink: 0; text-decoration: none; }
+  nav a { color: #7a6352; text-decoration: none; font-size: 14px; }
+  nav a:hover, nav a.active { color: #1a1a2e; }
+  nav .spacer { flex: 1; }
+  nav button.logout { background: none; border: 1px solid #c9b9a5; color: #7a6352; padding: 4px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+  .main { padding: 32px; max-width: 1100px; margin: 0 auto; }
+  .top-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  .top-bar h2 { font-size: 20px; font-weight: 800; flex: 1; }
+  select.filter { padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; background: white; }
+  button.primary { background: #4a3b30; color: white; border: none; padding: 9px 18px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
+  button.primary:hover { background: #33291f; }
+  button.secondary { background: white; color: #555; border: 1px solid #ddd; padding: 7px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; }
+  button.secondary:hover { background: #f5f5f5; }
+  button.danger { background: white; color: #ef4444; border: 1px solid #fca5a5; padding: 7px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; }
+  button.danger:hover { background: #fef2f2; }
+  .card { background: white; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.06); overflow: hidden; margin-bottom: 24px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { background: #f8f7ff; padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; color: #4a3b30; text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid #e5e7eb; }
+  tbody td { padding: 9px 14px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: #fafafe; }
+  .type-badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+  .type-MFC { background: #dbeafe; color: #1d4ed8; }
+  .type-LAMI { background: #d1fae5; color: #065f46; }
+  .type-ALU { background: #fef3c7; color: #b45309; }
+  .type-Accessories { background: #fce7f3; color: #9d174d; }
+  input.edit-inp { width: 100%; padding: 5px 8px; border: 1px solid #8a7364; border-radius: 6px; font-size: 13px; font-family: inherit; }
+  input.edit-inp:focus { outline: none; border-color: #4a3b30; }
+  .add-row td { background: #fafafe; padding: 10px 14px; }
+  .add-row input, .add-row select { padding: 7px 10px; border: 1px solid #e5e7eb; border-radius: 7px; font-size: 13px; width: 100%; }
+  .count-badge { background: #f0ebe1; color: #4a3b30; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #10b981; color: white; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; display: none; z-index: 100; }
+  .toast.error { background: #ef4444; }
+
+  @media(max-width:640px){
+    nav { padding: 8px 14px; gap: 8px; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+    nav::-webkit-scrollbar { display: none; }
+    .nav-logo { font-size: 15px; letter-spacing: 3px; }
+    nav a { font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+    nav .spacer { display: none; }
+    nav button.logout { white-space: nowrap; flex-shrink: 0; font-size: 11px; padding: 4px 8px; }
+    .main { padding: 12px; }
+    .top-bar h2 { font-size: 16px; }
+    .top-bar button.primary { font-size: 12px; padding: 8px 12px; }
+    /* Table scrolls horizontally */
+    .card { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { min-width: 580px; }
+    tbody td { padding: 8px 10px; }
+    thead th { padding: 8px 10px; }
+  }
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">melvin gan carpentry</a>
+  <a href="/">Dashboard</a>
+  <a href="/leads-page">All Leads</a>
+  <a href="/quotes-page">Quotations</a>
+  <a href="/products-page" class="active">Products</a>
+  <a href="/admin/presets">Library</a>
+  <div class="spacer"></div>
+  <form method="POST" action="/logout" style="margin:0"><button class="logout" type="submit">Sign out</button></form>
+</nav>
+
+<div class="main">
+  <div class="top-bar">
+    <h2>Product Master List</h2>
+    <select class="filter" id="filter-type" onchange="applyFilter()">
+      <option value="">All Types</option>
+      <option value="MFC">MFC</option>
+      <option value="LAMI">LAMI</option>
+      <option value="ALU">ALU</option>
+      <option value="Accessories">Accessories</option>
+    </select>
+    <select class="filter" id="filter-room" onchange="applyFilter()">
+      <option value="">All Categories</option>
+    </select>
+    <span class="count-badge" id="count-badge">0 items</span>
+    <button class="primary viewer-hide" onclick="showAddRow()">+ Add Product</button>
+  </div>
+
+  <div class="card">
+    <table id="prod-table">
+      <thead>
+        <tr>
+          <th style="width:90px">Type</th>
+          <th style="width:120px">Category</th>
+          <th>Description</th>
+          <th style="width:70px">UOM</th>
+          <th style="width:110px">Unit Price (RM)</th>
+          <th style="width:120px"></th>
+        </tr>
+      </thead>
+      <tbody id="prod-tbody">
+        <tr><td colspan="6" style="text-align:center;color:#aaa;padding:32px">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let allProducts = [];
+let editingId = null;
+let _viewer = false;
+
+async function load() {
+  try {
+    const me = await fetch('/me').then(r => r.json());
+    _viewer = me.role === 'viewer';
+    if (_viewer) {
+      document.querySelectorAll('.viewer-hide').forEach(el => el.style.display = 'none');
+      const sp = document.querySelector('nav .spacer');
+      if (sp) { const b = document.createElement('span'); b.textContent = 'View Only'; b.style.cssText = 'background:#fef3c7;color:#b45309;font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;white-space:nowrap'; sp.after(b); }
+    }
+  } catch(e) {}
+  allProducts = await fetch('/products/all').then(r => r.json());
+  buildRoomFilter();
+  applyFilter();
+}
+
+function buildRoomFilter() {
+  const rooms = [...new Set(allProducts.map(p => p.room))].sort();
+  const sel = document.getElementById('filter-room');
+  sel.innerHTML = '<option value="">All Categories</option>' +
+    rooms.map(r => `<option value="${esc(r)}">${esc(r)}</option>`).join('');
+}
+
+function applyFilter() {
+  const type = document.getElementById('filter-type').value;
+  const room = document.getElementById('filter-room').value;
+  const filtered = allProducts.filter(p =>
+    (!type || p.type === type) && (!room || p.room === room)
+  );
+  document.getElementById('count-badge').textContent = filtered.length + ' items';
+  renderTable(filtered);
+}
+
+function renderTable(products) {
+  const tbody = document.getElementById('prod-tbody');
+  if (!products.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:32px">No products found.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = products.map(p => rowHtml(p)).join('') + addRowHtml();
+}
+
+function rowHtml(p) {
+  if (editingId === p.id) return editRowHtml(p);
+  return `<tr id="row-${p.id}" style="${p.is_active ? '' : 'opacity:.45'}">
+    <td><span class="type-badge type-${esc(p.type)}">${esc(p.type)}</span></td>
+    <td>${esc(p.room)}</td>
+    <td>${esc(p.description)}</td>
+    <td>${esc(p.uom||'')}</td>
+    <td style="font-weight:700">RM ${Number(p.price).toFixed(2)}</td>
+    <td style="display:flex;gap:6px">
+      ${_viewer ? '' : `<button class="secondary" onclick="startEdit(${p.id})">Edit</button>
+      <button class="danger" onclick="deleteProduct(${p.id})">Delete</button>`}
+    </td>
+  </tr>`;
+}
+
+function editRowHtml(p) {
+  return `<tr id="row-${p.id}" style="background:#faf7f2">
+    <td><input class="edit-inp" id="e-type-${p.id}" value="${esc(p.type)}" placeholder="MFC"></td>
+    <td><input class="edit-inp" id="e-room-${p.id}" value="${esc(p.room)}" placeholder="Kitchen"></td>
+    <td><input class="edit-inp" id="e-desc-${p.id}" value="${esc(p.description)}"></td>
+    <td><input class="edit-inp" id="e-uom-${p.id}" value="${esc(p.uom||'')}" style="width:60px"></td>
+    <td><input class="edit-inp" id="e-price-${p.id}" type="number" value="${p.price}" style="width:90px"></td>
+    <td style="display:flex;gap:6px">
+      <button class="primary" onclick="saveEdit(${p.id})" style="padding:6px 12px">Save</button>
+      <button class="secondary" onclick="cancelEdit()">Cancel</button>
+    </td>
+  </tr>`;
+}
+
+function addRowHtml() {
+  if (_viewer) return '';
+  return `<tr class="add-row" id="add-row" style="display:none">
+    <td><input id="n-type" placeholder="e.g. MFC"></td>
+    <td><input id="n-room" placeholder="e.g. Kitchen"></td>
+    <td><input id="n-desc" placeholder="Description"></td>
+    <td><input id="n-uom" placeholder="Fr" style="width:60px"></td>
+    <td><input id="n-price" type="number" placeholder="0" style="width:90px"></td>
+    <td style="display:flex;gap:6px">
+      <button class="primary" onclick="saveNew()" style="padding:6px 12px">Add</button>
+      <button class="secondary" onclick="hideAddRow()">Cancel</button>
+    </td>
+  </tr>`;
+}
+
+function showAddRow() {
+  editingId = null;
+  applyFilter();
+  document.getElementById('add-row').style.display = '';
+  document.getElementById('n-type').focus();
+}
+
+function hideAddRow() {
+  const row = document.getElementById('add-row');
+  if (row) row.style.display = 'none';
+}
+
+function startEdit(id) {
+  editingId = id;
+  applyFilter();
+}
+
+function cancelEdit() {
+  editingId = null;
+  applyFilter();
+}
+
+async function saveEdit(id) {
+  const body = {
+    type: document.getElementById('e-type-'+id).value.trim(),
+    room: document.getElementById('e-room-'+id).value.trim(),
+    description: document.getElementById('e-desc-'+id).value.trim(),
+    uom: document.getElementById('e-uom-'+id).value.trim() || null,
+    price: parseFloat(document.getElementById('e-price-'+id).value) || 0,
+    is_active: true,
+  };
+  if (!body.type || !body.description) { showToast('Type and Description are required', true); return; }
+  const res = await fetch('/products/' + id, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  if (res.ok) {
+    const updated = await res.json();
+    const idx = allProducts.findIndex(p => p.id === id);
+    if (idx >= 0) allProducts[idx] = updated;
+    editingId = null;
+    buildRoomFilter();
+    applyFilter();
+    showToast('Saved ✓');
+  } else {
+    showToast('Save failed', true);
+  }
+}
+
+async function saveNew() {
+  const body = {
+    type: document.getElementById('n-type').value.trim(),
+    room: document.getElementById('n-room').value.trim(),
+    description: document.getElementById('n-desc').value.trim(),
+    uom: document.getElementById('n-uom').value.trim() || null,
+    price: parseFloat(document.getElementById('n-price').value) || 0,
+    is_active: true,
+  };
+  if (!body.type || !body.description) { showToast('Type and Description are required', true); return; }
+  const res = await fetch('/products', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  if (res.ok) {
+    const created = await res.json();
+    allProducts.push(created);
+    buildRoomFilter();
+    applyFilter();
+    showToast('Product added ✓');
+  } else {
+    showToast('Add failed', true);
+  }
+}
+
+async function deleteProduct(id) {
+  if (!confirm('Delete this product?')) return;
+  const res = await fetch('/products/' + id, { method: 'DELETE' });
+  if (res.ok) {
+    allProducts = allProducts.filter(p => p.id !== id);
+    buildRoomFilter();
+    applyFilter();
+    showToast('Deleted');
+  } else {
+    showToast('Delete failed', true);
+  }
+}
+
+function showToast(msg, isError=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2800);
+}
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+load();
+</script>
+</body>
+</html>

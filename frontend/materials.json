@@ -1,0 +1,674 @@
+[
+ {
+  "type": "MFC",
+  "room": "Kitchen",
+  "desc": "MFC Base Cabinet (600mm D x 850mm H)",
+  "uom": "Fr",
+  "price": 320.0
+ },
+ {
+  "type": "MFC",
+  "room": "Kitchen",
+  "desc": "MFC Wall Cabinet (300mm D x 700mm H)",
+  "uom": "Fr",
+  "price": 330.0
+ },
+ {
+  "type": "MFC",
+  "room": "Kitchen",
+  "desc": "MFC Wall Cabinet (300mm D x 1300mm H)",
+  "uom": "Fr",
+  "price": 530.0
+ },
+ {
+  "type": "MFC",
+  "room": "Kitchen",
+  "desc": "MFC Wall Cabinet (300mm D x 700mm H)",
+  "uom": "Fr",
+  "price": 450.0
+ },
+ {
+  "type": "MFC",
+  "room": "Kitchen",
+  "desc": "MFC Wall Cabinet (300mm D x 1300mm H)",
+  "uom": "Fr",
+  "price": 650.0
+ },
+ {
+  "type": "MFC",
+  "room": "Kitchen",
+  "desc": "MFC Tall / Full height Cabinet (600mm D x up to 2700mm H)",
+  "uom": "Fr",
+  "price": 640.0
+ },
+ {
+  "type": "MFC",
+  "room": "Kitchen",
+  "desc": "MFC Tall / Full height Cabinet (600mm D x up to 3300mm H)",
+  "uom": "Fr",
+  "price": 840.0
+ },
+ {
+  "type": "MFC",
+  "room": "Kitchen",
+  "desc": "MFC Tall / Full height cabinet (Open) (600mm D x up to 2700mm H)",
+  "uom": "Fr",
+  "price": 830.0
+ },
+ {
+  "type": "MFC",
+  "room": "Kitchen",
+  "desc": "MFC Tall / Full height cabinet (Open) (600mm D x up to 3300mm H)",
+  "uom": "Fr",
+  "price": 830.0
+ },
+ {
+  "type": "MFC",
+  "room": "Kitchen",
+  "desc": "MFC Fridge End Panel",
+  "uom": "Fr",
+  "price": 150.0
+ },
+ {
+  "type": "MFC",
+  "room": "Kitchen",
+  "desc": "MFC Drawer Set",
+  "uom": "set",
+  "price": 300.0
+ },
+ {
+  "type": "MFC",
+  "room": "Kitchen",
+  "desc": "MFC Island Cabinet (600mm D x 850mm H)",
+  "uom": "Fr",
+  "price": 540.0
+ },
+ {
+  "type": "MFC",
+  "room": "Kitchen",
+  "desc": "MFC Sauce Tray pull out tray (150 mm x 600mm)",
+  "uom": "Fr",
+  "price": 425.0
+ },
+ {
+  "type": "Plywood",
+  "room": "Kitchen",
+  "desc": "Plywood Base Cabinet BC1 (600mm D x 850mm H)",
+  "uom": "Fr",
+  "price": 470.0
+ },
+ {
+  "type": "Plywood",
+  "room": "Kitchen",
+  "desc": "Plywood Wall Cabinet (300mm D x 700mm H)",
+  "uom": "Fr",
+  "price": 480.0
+ },
+ {
+  "type": "Plywood",
+  "room": "Kitchen",
+  "desc": "Plywood Wall Cabinet (Open) (300mm D x 700mm H)",
+  "uom": "Fr",
+  "price": 620.0
+ },
+ {
+  "type": "Plywood",
+  "room": "Kitchen",
+  "desc": "Plywood Tall / Full height Cabinet TC-1 (600mm D x up to 2700mm H)",
+  "uom": "Fr",
+  "price": 910.0
+ },
+ {
+  "type": "Plywood",
+  "room": "Kitchen",
+  "desc": "Plywood Tall / Full height Cabinet (Open) (600mm D x up to 2700mm H)",
+  "uom": "Fr",
+  "price": 1210.0
+ },
+ {
+  "type": "Plywood",
+  "room": "Kitchen",
+  "desc": "Plywood Fridge End Panel",
+  "uom": "Fr",
+  "price": 200.0
+ },
+ {
+  "type": "Plywood",
+  "room": "Kitchen",
+  "desc": "Plywood Island Cabinet IC-1 (600mm D x 850mm H)",
+  "uom": "Fr",
+  "price": 640.0
+ },
+ {
+  "type": "Aluminium",
+  "room": "Kitchen",
+  "desc": "Aluminium Base Cabinet (540mm D x 725mm H)",
+  "uom": "Fr",
+  "price": 550.0
+ },
+ {
+  "type": "Aluminium",
+  "room": "Kitchen",
+  "desc": "Aluminium Wall Cabinet (300mm D x up to 700mm H)",
+  "uom": "Fr",
+  "price": 510.0
+ },
+ {
+  "type": "Aluminium",
+  "room": "Kitchen",
+  "desc": "Aluminium Wall Cabinet (300mm D x up to 1049mm H)",
+  "uom": "Fr",
+  "price": 740.0
+ },
+ {
+  "type": "Aluminium",
+  "room": "Kitchen",
+  "desc": "Aluminium Wall Cabinet (300mm D x up to 1349mm H)",
+  "uom": "Fr",
+  "price": 965.0
+ },
+ {
+  "type": "Aluminium",
+  "room": "Kitchen",
+  "desc": "Aluminium Tall / Full height Cabinet ATC-1 (520mm D x 3000mm H)",
+  "uom": "Fr",
+  "price": 1605.0
+ },
+ {
+  "type": "Aluminium",
+  "room": "Kitchen",
+  "desc": "Aluminium Island Cabinet (520mm D x  950mm H)",
+  "uom": null,
+  "price": 660.0
+ },
+ {
+  "type": "ALU + Honeycomb",
+  "room": "Kitchen",
+  "desc": "ALU + HONEYCOMB (WOODGRAIN) Base Cabinet (540mm D x 725mm H)",
+  "uom": "Fr",
+  "price": 645.0
+ },
+ {
+  "type": "ALU + Honeycomb",
+  "room": "Kitchen",
+  "desc": "ALU + HONEYCOMB (WOODGRAIN) Wall Cabinet (300mm D x up to 700mm H)",
+  "uom": "Fr",
+  "price": 545.0
+ },
+ {
+  "type": "ALU + Honeycomb",
+  "room": "Kitchen",
+  "desc": "ALU + HONEYCOMB (WOODGRAIN) Wall Cabinet (300mm D x up to 1049mm H)",
+  "uom": "Fr",
+  "price": 775.0
+ },
+ {
+  "type": "ALU + Honeycomb",
+  "room": "Kitchen",
+  "desc": "ALU + HONEYCOMB (WOODGRAIN) Wall Cabinet (300mm D x up to 1349mm H)",
+  "uom": "Fr",
+  "price": 1000.0
+ },
+ {
+  "type": "ALU + Honeycomb",
+  "room": "Kitchen",
+  "desc": "ALU + HONEYCOMB (WOODGRAIN) Tall / Full height Cabinet (520mm D x 3000mm H)",
+  "uom": "Fr",
+  "price": 1645.0
+ },
+ {
+  "type": "ALU + Honeycomb",
+  "room": "Kitchen",
+  "desc": "ALU + HONEYCOMB (WOODGRAIN) Island Cabinet (520mm D x  950mm H)",
+  "uom": "Fr",
+  "price": 660.0
+ },
+ {
+  "type": "Aluminium",
+  "room": "Kitchen",
+  "desc": "Aluminium Skirting",
+  "uom": "Fr",
+  "price": 10.0
+ },
+ {
+  "type": "Color Glass",
+  "room": "Kitchen",
+  "desc": "Backsplash in Colour Glass (600mm D)",
+  "uom": "Fr",
+  "price": 100.0
+ },
+ {
+  "type": "Color Glass",
+  "room": "Kitchen",
+  "desc": "Backsplash in Colour Glass (600mm D)",
+  "uom": "Fr",
+  "price": 120.0
+ },
+ {
+  "type": "Sintered Stone",
+  "room": "Kitchen",
+  "desc": "Backsplash in sintered stone (300 mm L x 300 mm H)",
+  "uom": "sqft",
+  "price": 250.0
+ },
+ {
+  "type": "Sintered Stone",
+  "room": "Kitchen",
+  "desc": "Sintered stone Countertop (thickness) (600mm D)",
+  "uom": "Fr",
+  "price": 250.0
+ },
+ {
+  "type": "Quartz",
+  "room": "Kitchen",
+  "desc": "Backsplash in Quartz Stone (600mm D)",
+  "uom": "Fr",
+  "price": 185.0
+ },
+ {
+  "type": "Quartz",
+  "room": "Kitchen",
+  "desc": "Quartz Stone Countertop (600mm D)",
+  "uom": "Fr",
+  "price": 185.0
+ },
+ {
+  "type": "Quartz",
+  "room": "Kitchen",
+  "desc": "Quartz Stone Countertop - Island (300 mm L x 300 mm H)",
+  "uom": "sqft",
+  "price": 110.0
+ },
+ {
+  "type": "Others",
+  "room": "Kitchen",
+  "desc": "Running Led lights",
+  "uom": "Fr",
+  "price": 35.0
+ },
+ {
+  "type": "LED",
+  "room": "Kitchen",
+  "desc": "Running Led lights",
+  "uom": "Fr",
+  "price": 60.0
+ },
+ {
+  "type": "Others",
+  "room": "Kitchen",
+  "desc": "PVC Sink Carcass",
+  "uom": "No",
+  "price": 250.0
+ },
+ {
+  "type": "Others",
+  "room": "Kitchen",
+  "desc": "Hole Opening",
+  "uom": "set",
+  "price": 110.0
+ },
+ {
+  "type": "Others",
+  "room": "Kitchen",
+  "desc": "Dish Rack (W9600) ECOWARE (600mm D ?)",
+  "uom": "set",
+  "price": 80.0
+ },
+ {
+  "type": "Others",
+  "room": "Kitchen",
+  "desc": "Pull Out Tray - (545.14.321) HAFELE (200mm W ?)",
+  "uom": "set",
+  "price": 450.0
+ },
+ {
+  "type": "Others",
+  "room": "Kitchen",
+  "desc": "Sink + Pull Out Tap [NTVT-6046B-SV + 8311-ST]",
+  "uom": "set",
+  "price": 450.0
+ },
+ {
+  "type": "Others",
+  "room": "Kitchen",
+  "desc": "Installation [Sink-INS-1]",
+  "uom": "set",
+  "price": 200.0
+ },
+ {
+  "type": "Others",
+  "room": "Kitchen",
+  "desc": "Rinnai Hood + Hob Set",
+  "uom": "set",
+  "price": 2200.0
+ },
+ {
+  "type": "Others",
+  "room": "Kitchen",
+  "desc": "Installation (hood and hoob) [Hood-INS-1]",
+  "uom": "set",
+  "price": 150.0
+ },
+ {
+  "type": "KTD",
+  "room": "Kitchen",
+  "desc": "Undermount Runner - KTD (L+R) (up to 10 kgs)",
+  "uom": "Pair",
+  "price": 90.0
+ },
+ {
+  "type": "Hafele",
+  "room": "Kitchen",
+  "desc": "Undermount Runner - Hafele (L+R) (up to 15 kgs)",
+  "uom": "Pair",
+  "price": 150.0
+ },
+ {
+  "type": "Hafele",
+  "room": "Kitchen",
+  "desc": "Sauce Tray pull out tray (200 mm x 600mm)",
+  "uom": "Fr",
+  "price": 450.0
+ },
+ {
+  "type": "Hafele",
+  "room": "Kitchen",
+  "desc": "Sauce Tray pull out tray (150 mm x 600mm)",
+  "uom": "Fr",
+  "price": 425.0
+ },
+ {
+  "type": "Hafele",
+  "room": "Kitchen",
+  "desc": "Wall Pull out Tray (600 mm x up to 850mm)",
+  "uom": "Fr",
+  "price": 1600.0
+ },
+ {
+  "type": "Hafele",
+  "room": "Kitchen",
+  "desc": "L Shape Corner Drawer",
+  "uom": "Fr",
+  "price": 3200.0
+ },
+ {
+  "type": "MFC",
+  "room": "Foyer",
+  "desc": "Shoe Cabinet (00?mm D x 350mm H)",
+  "uom": "Fr",
+  "price": 540.0
+ },
+ {
+  "type": "MFC",
+  "room": "Foyer",
+  "desc": "Console cabinet H:350 (00?mm D x 350mm H)",
+  "uom": "Fr",
+  "price": 350.0
+ },
+ {
+  "type": "Plywood",
+  "room": "Foyer",
+  "desc": "Plywood Shoe Cabinet (00?mm D x 350mm H)",
+  "uom": "Fr",
+  "price": 620.0
+ },
+ {
+  "type": "Plywood",
+  "room": "Foyer",
+  "desc": "Plywood Console cabinet (00?mm D x 350mm H)",
+  "uom": "Fr",
+  "price": 400.0
+ },
+ {
+  "type": "Aluminium",
+  "room": "Foyer",
+  "desc": "Aluminium Shoe Cabinet (380mm D x 1800mm H)",
+  "uom": "Fr",
+  "price": 780.0
+ },
+ {
+  "type": "Aluminium",
+  "room": "Foyer",
+  "desc": "Aluminium Shoe Cabinet (380mm D x 3000mm H)",
+  "uom": "Fr",
+  "price": 1005.0
+ },
+ {
+  "type": "ALU + Honeycomb",
+  "room": "Foyer",
+  "desc": "Shoe Cabinet (380mm D x 1800mm H)",
+  "uom": "Fr",
+  "price": 815.0
+ },
+ {
+  "type": "ALU + Honeycomb",
+  "room": "Foyer",
+  "desc": "Shoe Cabinet (380mm D x 3000mm H)",
+  "uom": "Fr",
+  "price": 1040.0
+ },
+ {
+  "type": "MFC",
+  "room": "Living Room",
+  "desc": "MFC Wall Paneling (300 mm L x 300 mm H)",
+  "uom": "Sf",
+  "price": 45.0
+ },
+ {
+  "type": "MFC",
+  "room": "Living Room",
+  "desc": "MFC TV Console Cabinet (00mm D x Up to 350mm H)",
+  "uom": "Fr",
+  "price": 350.0
+ },
+ {
+  "type": "Plywood",
+  "room": "Living Room",
+  "desc": "Plywood Wall Paneling (300 mm L x 300 mm H)",
+  "uom": "Sf",
+  "price": 65.0
+ },
+ {
+  "type": "Plywood",
+  "room": "Living Room",
+  "desc": "Plywood TV Console Cabinet (00mm D x Up to 350mm H)",
+  "uom": "Fr",
+  "price": 400.0
+ },
+ {
+  "type": "Aluminium",
+  "room": "Living Room",
+  "desc": "Aluminium TV Console (450mm D x 450mm H)",
+  "uom": "Fr",
+  "price": 530.0
+ },
+ {
+  "type": "MFC",
+  "room": "Bedroom",
+  "desc": "MFC Swing Wardrobe (600mm D x 2700mm H)",
+  "uom": "Fr",
+  "price": 650.0
+ },
+ {
+  "type": "MFC",
+  "room": "Bedroom",
+  "desc": "MFC Wardrobe (Open Concept) (600mm D x 2700mm H)",
+  "uom": "Fr",
+  "price": 820.0
+ },
+ {
+  "type": "MFC",
+  "room": "Bedroom",
+  "desc": "MFC Sliding Wardrobe (H: 2400 x Carcass H: 2100)",
+  "uom": "Fr",
+  "price": 980.0
+ },
+ {
+  "type": "MFC",
+  "room": "Bedroom",
+  "desc": "MFC with Aluminium Glass Door Cabinet",
+  "uom": "Fr",
+  "price": 1150.0
+ },
+ {
+  "type": "MFC",
+  "room": "Bedroom",
+  "desc": "MFC Dressing Table (600mm D x 300mm H)",
+  "uom": "Fr",
+  "price": 350.0
+ },
+ {
+  "type": "MFC",
+  "room": "Bedroom",
+  "desc": "MFC Bed head 4 ft Height (1200mm H)",
+  "uom": "Fr",
+  "price": 180.0
+ },
+ {
+  "type": "MFC",
+  "room": "Bedroom",
+  "desc": "MFC Bed head 5 ft Height (1500mm H)",
+  "uom": "Fr",
+  "price": 220.0
+ },
+ {
+  "type": "Plywood",
+  "room": "Bedroom",
+  "desc": "Plywood Swing Wardrobe (600mm D x 2700mm H)",
+  "uom": "Fr",
+  "price": 940.0
+ },
+ {
+  "type": "Plywood",
+  "room": "Bedroom",
+  "desc": "Plywood Wardrobe (Open Concept) (600mm D x 2700mm H)",
+  "uom": "Fr",
+  "price": 1270.0
+ },
+ {
+  "type": "Plywood",
+  "room": "Bedroom",
+  "desc": "Plywood Sliding Wardrobe (H: 2400 x Carcass H: 2100)",
+  "uom": "Fr",
+  "price": 1230.0
+ },
+ {
+  "type": "Plywood",
+  "room": "Bedroom",
+  "desc": "Plywood with Aluminium Glass Door Cabinet",
+  "uom": "Fr",
+  "price": 1750.0
+ },
+ {
+  "type": "Plywood",
+  "room": "Bedroom",
+  "desc": "Plywood Dressing Table (600mm D x 300mm H)",
+  "uom": "Fr",
+  "price": 400.0
+ },
+ {
+  "type": "ALU + Honeycomb",
+  "room": "Bedroom",
+  "desc": "ALU + HONEYCOMB (WOODGRAIN) Display cabinet (350mmD x 3000mm H)",
+  "uom": "Fr",
+  "price": 995.0
+ },
+ {
+  "type": "ALU + Honeycomb",
+  "room": "Bedroom",
+  "desc": "ALU + HONEYCOMB (WOODGRAIN) Book cabinet (350mmD x 3000mm H)",
+  "uom": "Fr",
+  "price": 995.0
+ },
+ {
+  "type": "ALU + Honeycomb",
+  "room": "Bedroom",
+  "desc": "ALU + HONEYCOMB (WOODGRAIN) Study table (600mmD)",
+  "uom": "Fr",
+  "price": 625.0
+ },
+ {
+  "type": "ALU + Honeycomb",
+  "room": "Bedroom",
+  "desc": "ALU + HONEYCOMB (WOODGRAIN) Wardrobe (550mmD x 3000mm H)",
+  "uom": "Fr",
+  "price": 1670.0
+ },
+ {
+  "type": "Ceiling",
+  "room": "Ceiling",
+  "desc": "Flat gypsum board ceiling w/ plastering",
+  "uom": "Sf",
+  "price": 5.2
+ },
+ {
+  "type": "Ceiling",
+  "room": "Ceiling",
+  "desc": "Construct plaster ceiling L-box for LED strip / T5 concealed lighting",
+  "uom": "Fr",
+  "price": 30.0
+ },
+ {
+  "type": "Ceiling",
+  "room": "Ceiling",
+  "desc": "13A power points w/ SSO using 2.5mm SIRIM in PVC conduit piping installation & concealed work",
+  "uom": "set",
+  "price": 150.0
+ },
+ {
+  "type": "Ceiling",
+  "room": "Ceiling",
+  "desc": "Lighting/Fan point w/ SSO using 2.5mm SIRIM in PVC conduit piping installation & concealed work",
+  "uom": "set",
+  "price": 110.0
+ },
+ {
+  "type": "Ceiling",
+  "room": "Ceiling",
+  "desc": "Downlight / Eyeball & installation",
+  "uom": "Unit",
+  "price": 60.0
+ },
+ {
+  "type": "Ceiling",
+  "room": "Ceiling",
+  "desc": "Mounted casing / bulb & installation",
+  "uom": "Unit",
+  "price": 80.0
+ },
+ {
+  "type": "Ceiling",
+  "room": "Ceiling",
+  "desc": "LED lighting strip and (Standard) aluminium profile c/w installation",
+  "uom": "Mr",
+  "price": 70.0
+ },
+ {
+  "type": "Ceiling",
+  "room": "Ceiling",
+  "desc": "Magnetic track w/ necessary accessories & transformer c/w installation",
+  "uom": "Mr",
+  "price": 140.0
+ },
+ {
+  "type": "Ceiling",
+  "room": "Ceiling",
+  "desc": "Magnetic tracklight (Lamphill) Ceiling tracklight w/ 3 spots & installation",
+  "uom": "Set",
+  "price": 200.0
+ },
+ {
+  "type": "Ceiling",
+  "room": "Ceiling",
+  "desc": "Hacking and relocation wirings (Rooms)",
+  "uom": "set",
+  "price": 500.0
+ },
+ {
+  "type": "Ceiling",
+  "room": "Ceiling",
+  "desc": "Fan installation",
+  "uom": "set",
+  "price": 80.0
+ }
+]

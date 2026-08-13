@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Quick Add Lead — Melvin Gan Carpentry</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f0ebff;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 40px;
+  }
+
+  header {
+    width: 100%;
+    background: #4a3b30;
+    color: white;
+    padding: 18px 20px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  header h1 { font-size: 17px; font-weight: 700; }
+  header span { font-size: 13px; opacity: .75; }
+
+  .card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin: 16px 14px 0;
+    width: calc(100% - 28px);
+    max-width: 480px;
+    box-shadow: 0 2px 12px rgba(122,99,82,.1);
+  }
+
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #6b5544;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 6px;
+  }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 16px; /* prevents iOS zoom */
+    font-family: inherit;
+    color: #111;
+    background: #fafafa;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: #4a3b30;
+    background: white;
+  }
+  .field input.err { border-color: #ef4444; }
+  .field textarea { min-height: 80px; resize: vertical; }
+
+  .source-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .src-btn {
+    padding: 11px 8px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+    background: #fafafa;
+    cursor: pointer;
+    text-align: center;
+    transition: all .15s;
+  }
+  .src-btn.active {
+    border-color: #4a3b30;
+    background: #f0ebe1;
+    color: #4a3b30;
+  }
+
+  .save-btn {
+    width: 100%;
+    padding: 16px;
+    background: #4a3b30;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 4px;
+    letter-spacing: .2px;
+    transition: background .15s;
+  }
+  .save-btn:active { background: #33291f; }
+  .save-btn:disabled { background: #d3c3ae; cursor: not-allowed; }
+
+  /* Success screen */
+  .success {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 40px 20px;
+  }
+  .success.show { display: flex; }
+  .tick {
+    width: 72px; height: 72px;
+    background: #d1fae5;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px;
+    margin-bottom: 16px;
+  }
+  .success h2 { font-size: 20px; font-weight: 700; color: #065f46; margin-bottom: 6px; }
+  .success p  { font-size: 14px; color: #555; margin-bottom: 24px; }
+  .success a  { color: #4a3b30; font-weight: 600; font-size: 14px; text-decoration: none; }
+
+  .another-btn {
+    width: 100%;
+    padding: 15px;
+    background: #4a3b30;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 12px;
+  }
+  .view-btn-outline {
+    width: 100%;
+    padding: 14px;
+    background: white;
+    color: #4a3b30;
+    border: 1.5px solid #4a3b30;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .err-msg { font-size: 11px; color: #ef4444; margin-top: 4px; display: none; }
+  .err-msg.show { display: block; }
+  .type-chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 0; }
+  .type-chip { display: inline-flex; align-items: center; }
+  .type-chip input[type=checkbox] { display: none; }
+  .type-chip label { padding: 10px 14px; border: 1.5px solid #e5e7eb; border-radius: 20px; font-size: 14px; font-weight: 600; color: #555; cursor: pointer; transition: all .15s; user-select: none; }
+  .type-chip label:hover { border-color: #8a7364; color: #4a3b30; }
+  .type-chip input:checked + label { border-color: #4a3b30; background: #f0ebe1; color: #4a3b30; }
+
+  .spinner {
+    display: inline-block;
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin .6s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🏠 Melvin Gan Carpentry</h1>
+    <span>Quick Add Lead</span>
+  </div>
+</header>
+
+<!-- Form -->
+<div class="card" id="form-card">
+
+  <div class="field">
+    <label>Name *</label>
+    <input id="f-name" type="text" placeholder="Client full name" autocomplete="name">
+    <div class="err-msg" id="err-name">Name is required</div>
+  </div>
+
+  <div class="field">
+    <label>WhatsApp / Phone *</label>
+    <input id="f-phone" type="tel" placeholder="+601X-XXXXXXX" autocomplete="tel">
+    <div class="err-msg" id="err-phone">Phone is required</div>
+  </div>
+
+  <div class="field">
+    <label>Source</label>
+    <div class="source-row">
+      <div class="src-btn active" data-val="fb_ads"     onclick="setSource('fb_ads')">FB Ads</div>
+      <div class="src-btn"        data-val="tiktok_ads" onclick="setSource('tiktok_ads')">TikTok Ads</div>
+      <div class="src-btn"        data-val="referral"   onclick="setSource('referral')">Referral</div>
+      <div class="src-btn"        data-val="other"      onclick="setSource('other')">Other</div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Project Type (optional)</label>
+    <div class="type-chips">
+      <span class="type-chip"><input type="checkbox" id="qa-hmv" value="Home Make Over"><label for="qa-hmv">Home Make Over</label></span>
+      <span class="type-chip"><input type="checkbox" id="qa-kit" value="Kitchen"><label for="qa-kit">Kitchen</label></span>
+      <span class="type-chip"><input type="checkbox" id="qa-wet" value="Wetworks"><label for="qa-wet">Wetworks</label></span>
+      <span class="type-chip"><input type="checkbox" id="qa-cab" value="Cabinetry"><label for="qa-cab">Cabinetry</label></span>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Budget (optional)</label>
+    <input id="f-budget" type="text" placeholder="e.g. 50k, RM 80,000">
+  </div>
+
+  <div class="field">
+    <label>Notes (optional)</label>
+    <textarea id="f-notes" placeholder="What does the client want? e.g. Kitchen + 3 bedrooms, Ara Damansara condo"></textarea>
+  </div>
+
+  <button class="save-btn" id="save-btn" onclick="saveLead()">Save Lead</button>
+</div>
+
+<!-- Success -->
+<div class="card success" id="success-card">
+  <div class="tick">✓</div>
+  <h2 id="success-name"></h2>
+  <p id="success-sub"></p>
+  <button class="another-btn" onclick="reset()">+ Add Another Lead</button>
+  <button class="view-btn-outline" onclick="viewLead()">View Lead →</button>
+</div>
+
+<script>
+let source = 'fb_ads';
+let savedLeadId = null;
+
+function setSource(val) {
+  source = val;
+  document.querySelectorAll('.src-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.val === val);
+  });
+}
+
+function validate() {
+  let ok = true;
+  const name  = document.getElementById('f-name').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+
+  document.getElementById('f-name').classList.toggle('err', !name);
+  document.getElementById('err-name').classList.toggle('show', !name);
+  if (!name) ok = false;
+
+  document.getElementById('f-phone').classList.toggle('err', !phone);
+  document.getElementById('err-phone').classList.toggle('show', !phone);
+  if (!phone) ok = false;
+
+  return ok;
+}
+
+async function saveLead() {
+  if (!validate()) {
+    if (!document.getElementById('f-name').value.trim()) {
+      document.getElementById('f-name').focus();
+    } else {
+      document.getElementById('f-phone').focus();
+    }
+    return;
+  }
+
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Saving…';
+
+  const body = {
+    full_name:      document.getElementById('f-name').value.trim(),
+    phone:          document.getElementById('f-phone').value.trim(),
+    source_channel: source,
+    project_type:   Array.from(document.querySelectorAll('.type-chips input:checked')).map(cb=>cb.value).join(',')||null,
+    budget:         document.getElementById('f-budget').value.trim() || null,
+    request_notes:  document.getElementById('f-notes').value.trim() || null,
+  };
+
+  try {
+    const res = await fetch('/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (res.redirected || res.url.includes('/login')) {
+      window.location.href = '/login';
+      return;
+    }
+    if (!res.ok) {
+      const e = await res.json().catch(() => ({}));
+      throw new Error(e.detail || `Error ${res.status}`);
+    }
+
+    const lead = await res.json();
+    savedLeadId = lead.id;
+
+    const srcLabels = { fb_ads:'FB Ads', tiktok_ads:'TikTok Ads', referral:'Referral', other:'Other' };
+    document.getElementById('success-name').textContent = lead.full_name + ' added ✓';
+    document.getElementById('success-sub').textContent  =
+      `${lead.phone || ''} · ${srcLabels[source] || source}`;
+
+    document.getElementById('form-card').style.display    = 'none';
+    document.getElementById('success-card').classList.add('show');
+
+  } catch (err) {
+    alert('Failed to save: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Lead';
+  }
+}
+
+function reset() {
+  savedLeadId = null;
+  document.getElementById('f-name').value   = '';
+  document.getElementById('f-phone').value  = '';
+  document.getElementById('f-budget').value = '';
+  document.getElementById('f-notes').value  = '';
+  document.querySelectorAll('.type-chips input[type=checkbox]').forEach(cb => cb.checked = false);
+  ['f-name','f-phone'].forEach(id => document.getElementById(id).classList.remove('err'));
+  ['err-name','err-phone'].forEach(id => document.getElementById(id).classList.remove('show'));
+  setSource('fb_ads');
+  document.getElementById('form-card').style.display = '';
+  document.getElementById('success-card').classList.remove('show');
+  document.getElementById('f-name').focus();
+}
+
+function viewLead() {
+  if (savedLeadId) window.location.href = '/lead/' + savedLeadId;
+}
+
+// Auto-focus name on load
+window.addEventListener('load', () => document.getElementById('f-name').focus());
+</script>
+</body>
+</html>

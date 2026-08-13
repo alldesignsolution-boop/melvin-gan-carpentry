@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Melvin Gan Carpentry — Pipeline</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@200&display=swap');
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f6fa; color: #1a1a2e; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+nav { background: #f0ebe1; padding: 16px 32px; display: flex; align-items: center; gap: 24px; flex-shrink: 0; }
+.nav-logo { font-family: 'Raleway', sans-serif; font-weight: 200; font-size: 19px; letter-spacing: 4px; color: #1a1a2e; white-space: nowrap; flex-shrink: 0; text-decoration: none; }
+nav a { color: #7a6352; text-decoration: none; font-size: 14px; }
+nav a:hover, nav a.active { color: #1a1a2e; }
+nav .spacer { flex: 1; }
+nav button.logout { background: none; border: 1px solid #c9b9a5; color: #7a6352; padding: 4px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+nav button.logout:hover { border-color: #8a7060; color: #1a1a2e; }
+
+.toolbar { padding: 12px 20px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; border-bottom: 1px solid #e8e8f0; background: white; }
+.toolbar h2 { font-size: 15px; font-weight: 700; }
+.toolbar input { padding: 7px 11px; border: 1px solid #ddd; border-radius: 7px; font-size: 13px; width: 190px; }
+.toolbar select { padding: 7px 11px; border: 1px solid #ddd; border-radius: 7px; font-size: 13px; background: white; }
+button.primary { background: #4a3b30; color: white; border: none; padding: 8px 16px; border-radius: 7px; font-size: 13px; cursor: pointer; font-weight: 600; }
+button.primary:hover { background: #33291f; }
+
+/* Board */
+.board-wrap { flex: 1; overflow-x: auto; overflow-y: hidden; padding: 16px 20px; }
+.board { display: flex; gap: 14px; height: 100%; min-width: max-content; }
+
+.column {
+  width: 230px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: #ececf3;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.col-header {
+  padding: 11px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.col-count {
+  background: rgba(0,0,0,.12);
+  color: inherit;
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.col-new                 .col-header { background: #3b82f6; color: white; }
+.col-contacted           .col-header { background: #f59e0b; color: white; }
+.col-high_potential      .col-header { background: #f97316; color: white; }
+.col-site_visit          .col-header { background: #ec4899; color: white; }
+.col-quoted              .col-header { background: #8b5cf6; color: white; }
+.col-late_key_collection .col-header { background: #14b8a6; color: white; }
+.col-won                 .col-header { background: #10b981; color: white; }
+.col-lost                .col-header { background: #6b7280; color: white; }
+.col-name-inp {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px;
+  border: none; background: transparent; color: inherit; flex: 1; min-width: 0;
+  cursor: text; padding: 1px 3px; border-radius: 4px; font-family: inherit;
+}
+.col-name-inp:hover { background: rgba(255,255,255,.18); }
+.col-name-inp:focus { outline: 1px solid rgba(255,255,255,.5); background: rgba(255,255,255,.18); }
+.col-move {
+  background: none; border: none; color: rgba(255,255,255,.85); cursor: pointer;
+  font-size: 17px; padding: 0 2px; line-height: 1; flex-shrink: 0; font-weight: 700;
+}
+.col-move:hover { color: white; }
+.col-move:disabled { color: rgba(255,255,255,.25); cursor: default; }
+
+.col-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 80px;
+}
+.col-body.drag-over {
+  background: rgba(122,99,82,.07);
+  outline: 2px dashed #4a3b30;
+  outline-offset: -4px;
+  border-radius: 0 0 12px 12px;
+}
+
+/* Cards */
+.card {
+  background: white;
+  border-radius: 9px;
+  padding: 11px 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  cursor: grab;
+  position: relative;
+  user-select: none;
+  transition: box-shadow .15s, transform .1s;
+}
+.card:active { cursor: grabbing; }
+.card.dragging { opacity: .5; transform: scale(.98); }
+
+.card-name { font-size: 13px; font-weight: 700; color: #1a1a2e; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 18px; }
+.card-followup { font-size: 11.5px; color: #888; font-weight: 600; margin-bottom: 5px; }
+.card-followup.none { color: #bbb; font-weight: 400; font-style: italic; }
+.card-followup.msg { font-weight: 500; color: #6b5544; white-space: normal; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.card-meta { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.src-badge { font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 8px; }
+.src-fb_ads     { background: #dbeafe; color: #1d4ed8; }
+.src-tiktok_ads { background: #fce7f3; color: #9d174d; }
+.src-referral   { background: #d1fae5; color: #065f46; }
+.src-website    { background: #fef3c7; color: #92400e; }
+.src-other      { background: #f3f4f6; color: #374151; }
+.card-age { font-size: 10px; color: #aaa; }
+.card-budget { font-size: 11px; color: #555; font-weight: 600; }
+.card-pic { font-size: 10px; color: #999; margin-top: 5px; }
+.card-won-val { font-size: 12px; font-weight: 700; color: #065f46; margin-bottom: 4px; }
+/* View-only users don't see won-deal values or budget figures on cards. */
+body.viewer .card-won-val, body.viewer .card-budget { display: none !important; }
+.card-appt { font-size: 11px; font-weight: 700; color: white; background: #f97316; border-radius: 6px; padding: 3px 8px; margin-top: 5px; display: inline-block; }
+.area-badge { font-size: 10px; font-weight: 700; padding: 1px 8px; border-radius: 8px; letter-spacing: .3px; }
+.area-sv_selangor { background: #dbeafe; color: #1d4ed8; }
+.area-sv_kl       { background: #fce7f3; color: #9d174d; }
+.area-sv_border   { background: #d1fae5; color: #065f46; }
+.area-office      { background: #e0e7ff; color: #3730a3; }
+/* legacy values (migrated to office server-side) — style like Office if seen */
+.area-pj, .area-kl, .area-border { background: #e0e7ff; color: #3730a3; }
+.area-filters { display: flex; gap: 5px; }
+#area-filter { padding: 6px 13px; border: 1.5px solid #ddd; border-radius: 20px; font-size: 12px; font-weight: 600; color: #666; cursor: pointer; background: white; transition: all .15s; font-family: inherit; }
+#area-filter:hover, #area-filter:focus { border-color: #4a3b30; color: #4a3b30; outline: none; }
+#sort-appt-btn { padding: 6px 13px; border: 1.5px solid #ddd; border-radius: 20px; font-size: 12px; font-weight: 600; color: #666; cursor: pointer; background: white; transition: all .15s; font-family: inherit; white-space: nowrap; }
+#sort-appt-btn:hover { border-color: #f97316; color: #f97316; }
+#sort-appt-btn.active { border-color: #f97316; background: #f97316; color: white; }
+.card.drag-target { box-shadow: 0 -3px 0 0 #4a3b30 inset, 0 1px 3px rgba(0,0,0,.08); }
+
+
+/* Context menu */
+.ctx-menu {
+  position: fixed;
+  background: white;
+  border-radius: 9px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.15);
+  padding: 5px 0;
+  min-width: 190px;
+  z-index: 1000;
+  font-size: 13px;
+  display: none;
+}
+.ctx-menu.open { display: block; }
+.ctx-item {
+  padding: 9px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ctx-item:hover { background: #faf7f2; color: #4a3b30; }
+.ctx-sep { height: 1px; background: #f0f0f5; margin: 4px 0; }
+
+/* Add Lead inline */
+.add-card {
+  background: rgba(255,255,255,.6);
+  border: 1.5px dashed #ccc;
+  border-radius: 9px;
+  padding: 9px 12px;
+  font-size: 12px;
+  color: #999;
+  cursor: pointer;
+  text-align: center;
+  transition: all .15s;
+  flex-shrink: 0;
+}
+.add-card:hover { background: white; border-color: #4a3b30; color: #4a3b30; }
+
+/* Modal */
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); align-items: center; justify-content: center; z-index: 200; }
+.modal-bg.open { display: flex; }
+.modal { background: white; border-radius: 14px; padding: 28px; width: 460px; max-width: 96vw; max-height: 92vh; overflow-y: auto; }
+.modal h3 { font-size: 15px; font-weight: 700; margin-bottom: 18px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fg { display: flex; flex-direction: column; margin-bottom: 12px; }
+.fg label { font-size: 11px; color: #666; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 4px; }
+.fg input, .fg select, .fg textarea { padding: 9px 11px; border: 1px solid #ddd; border-radius: 7px; font-size: 13px; font-family: inherit; background: white; }
+.fg textarea { min-height: 66px; resize: vertical; }
+.type-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 0; }
+.type-chip { display: inline-flex; align-items: center; }
+.type-chip input[type=checkbox] { display: none; }
+.type-chip label { padding: 6px 12px; border: 1.5px solid #e5e7eb; border-radius: 20px; font-size: 12px; font-weight: 600; color: #555; cursor: pointer; transition: all .15s; user-select: none; }
+.type-chip label:hover { border-color: #8a7364; color: #4a3b30; }
+.type-chip input:checked + label { border-color: #4a3b30; background: #f0ebe1; color: #4a3b30; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+button.secondary { background: white; color: #444; border: 1px solid #ddd; padding: 8px 16px; border-radius: 7px; font-size: 13px; cursor: pointer; }
+
+.toast { position: fixed; bottom: 20px; right: 20px; background: #10b981; color: white; padding: 11px 18px; border-radius: 9px; font-size: 13px; font-weight: 600; display: none; z-index: 500; }
+.toast.err { background: #ef4444; }
+
+@media(max-width:640px){
+  nav { padding: 8px 14px; gap: 8px; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+  nav::-webkit-scrollbar { display: none; }
+  .nav-logo { font-size: 15px; letter-spacing: 3px; }
+  nav a { font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+  nav .spacer { display: none; }
+  nav button.logout { white-space: nowrap; flex-shrink: 0; font-size: 11px; padding: 4px 8px; }
+  .toolbar { flex-wrap: wrap; padding: 8px 12px; gap: 6px; }
+  .toolbar h2 { font-size: 13px; flex: 1; }
+  .toolbar input { width: auto; flex: 1; min-width: 120px; order: 3; }
+  .toolbar select { flex: 1; min-width: 110px; order: 4; }
+  .toolbar button.primary { order: 2; }
+  .board-wrap { padding: 10px 8px; }
+  .column { width: 200px; }
+  .modal { padding: 18px; }
+  .form-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">melvin gan carpentry</a>
+  <a href="/">Dashboard</a>
+  <a href="/leads-page" class="active">All Leads</a>
+  <a href="/quotes-page">Quotations</a>
+  <a href="/checklists-page">Checklists</a>
+  <a href="/admin/presets">Library</a>
+  <div class="spacer"></div>
+  <form method="POST" action="/logout" style="margin:0">
+    <button class="logout" type="submit">Sign out</button>
+  </form>
+</nav>
+
+<div class="toolbar">
+  <h2>Sales Pipeline</h2>
+  <input type="text" id="search-input" placeholder="Search name / phone…" oninput="renderBoard()">
+  <div class="area-filters">
+    <select id="area-filter" onchange="setArea(this.value)">
+      <option value="">All Locations</option>
+      <option value="sv_selangor">Site Visit, Selangor</option>
+      <option value="sv_kl">Site Visit, KL</option>
+      <option value="sv_border">Site Visit, Border</option>
+      <option value="office">Office</option>
+    </select>
+  </div>
+  <button id="sort-appt-btn" onclick="toggleApptSort()" title="Sort each column by appointment date, closest first">📅 Sort by Appointment</button>
+  <div class="spacer" style="flex:1"></div>
+  <button class="primary viewer-hide" onclick="openModal()">+ Add Lead</button>
+</div>
+
+<div class="board-wrap">
+  <div class="board" id="board"></div>
+</div>
+
+<!-- Context Menu -->
+<div class="ctx-menu" id="ctx-menu">
+  <div class="ctx-item" id="ctx-flag-action" onclick="ctxToggleFlag()">
+    <span id="ctx-flag-icon">🚩</span>
+    <span id="ctx-flag-label">Flag Follow-up</span>
+  </div>
+  <div class="ctx-item" id="ctx-appt-action" onclick="ctxSetAppointment()" style="display:none">📅 Set Visit Date</div>
+  <div class="ctx-item viewer-hide" id="ctx-lost-action" onclick="ctxMoveToLost()" style="display:none;color:#b91c1c">🚫 Move to Lost…</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="ctxView()">👁 View Lead</div>
+</div>
+
+<!-- Add Lead Modal -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <h3>Add New Lead</h3>
+    <div class="form-row">
+      <div class="fg"><label>Name *</label><input id="f-name" type="text" placeholder="Full name"></div>
+      <div class="fg"><label>Phone</label><input id="f-phone" type="text" placeholder="+60…"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Budget</label><input id="f-budget" type="text" placeholder="e.g. 50k"></div>
+      <div class="fg">
+        <label>Source</label>
+        <select id="f-source">
+          <option value="">— Select —</option>
+          <option value="fb_ads">FB Ads</option>
+          <option value="tiktok_ads">TikTok Ads</option>
+          <option value="referral">Referral</option>
+          <option value="website">Website</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="fg">
+        <label>Appointment Location</label>
+        <select id="f-area">
+          <option value="">— None —</option>
+          <option value="sv_selangor">Site Visit, Selangor</option>
+          <option value="sv_kl">Site Visit, KL</option>
+          <option value="sv_border">Site Visit, Border</option>
+          <option value="office">Office</option>
+        </select>
+      </div>
+      <div class="fg"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Initial Stage</label>
+        <select id="f-status">
+          <option value="new">New Lead</option>
+          <option value="site_visit">Site Visit</option>
+          <option value="negotiating">Negotiating</option>
+          <option value="late_key_collection">Late Key Collection</option>
+        </select>
+      </div>
+      <div class="fg"><label>Project Type</label>
+        <div class="type-chips" id="f-type-wrap">
+          <span class="type-chip"><input type="checkbox" id="pm-hmv" value="Home Make Over"><label for="pm-hmv">Home Make Over</label></span>
+          <span class="type-chip"><input type="checkbox" id="pm-kit" value="Kitchen"><label for="pm-kit">Kitchen</label></span>
+          <span class="type-chip"><input type="checkbox" id="pm-wet" value="Wetworks"><label for="pm-wet">Wetworks</label></span>
+          <span class="type-chip"><input type="checkbox" id="pm-cab" value="Cabinetry"><label for="pm-cab">Cabinetry</label></span>
+        </div>
+      </div>
+    </div>
+    <div class="fg"><label>Notes</label><textarea id="f-notes" placeholder="What does the client need?"></textarea></div>
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeModal()">Cancel</button>
+      <button class="primary" onclick="saveLead()">Save Lead</button>
+    </div>
+  </div>
+</div>
+
+<!-- Site Visit Appointment Modal -->
+<div class="modal-bg" id="appt-modal-bg">
+  <div class="modal" style="width:380px">
+    <h3>📅 Site Visit Appointment</h3>
+    <div class="fg" style="margin-bottom:18px">
+      <label>Date &amp; Time</label>
+      <input id="appt-input" type="datetime-local" step="1800" style="font-size:15px">
+    </div>
+    <div class="modal-actions">
+      <button class="secondary" style="color:#ef4444;border-color:#fca5a5" onclick="removeAppt()">Remove Date</button>
+      <button class="secondary" onclick="skipAppt()">Skip</button>
+      <button class="primary" style="background:#f97316" onclick="confirmAppt()">Save Date</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lost Reason Modal -->
+<div class="modal-bg" id="lost-modal-bg">
+  <div class="modal" style="width:360px">
+    <h3>Why was this lost?</h3>
+    <div class="fg" style="margin-bottom:18px">
+      <label>Reason</label>
+      <select id="lost-reason-sel">
+        <option value="">— Select a reason —</option>
+        <option value="price_too_high">Price Too High</option>
+        <option value="chose_competitor">Chose Competitor</option>
+        <option value="project_cancelled">Project Cancelled</option>
+        <option value="no_response">No Response (ghosted)</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="secondary" onclick="cancelLost()">Cancel</button>
+      <button class="primary" onclick="confirmLost()">Confirm Lost</button>
+    </div>
+  </div>
+</div>
+
+<!-- Won Value Modal -->
+<div class="modal-bg" id="won-modal-bg">
+  <div class="modal" style="width:360px">
+    <h3>🎉 Deal Won!</h3>
+    <div class="fg" style="margin-bottom:18px">
+      <label>Deal Value (RM)</label>
+      <input id="won-value-input" type="number" min="0" placeholder="e.g. 45000" style="font-size:18px;font-weight:700">
+    </div>
+    <div class="modal-actions">
+      <button class="secondary" onclick="cancelWon()">Cancel</button>
+      <button class="primary" style="background:#10b981" onclick="confirmWon()">Save Won Deal</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DEFAULT_COLS = [
+  { key: 'new',                 label: 'New Lead' },
+  { key: 'site_visit',          label: 'Site Visit' },
+  { key: 'negotiating',         label: 'Negotiating' },
+  { key: 'late_key_collection', label: 'Late Key Collection' },
+  { key: 'won',                 label: 'Won' },
+  { key: 'lost',                label: 'Lost' },
+];
+// Columns that were removed from the board. Any lead in these statuses is moved to
+// 'new' server-side (main.py migration); here we strip the keys from saved layouts.
+const RETIRED_COLS = ['contacted', 'quoted'];
+const FLAG_STAGES = new Set(['new','site_visit','negotiating','late_key_collection']);
+
+// Column config — order & custom labels persisted in localStorage
+let colConfig = null;
+try { colConfig = JSON.parse(localStorage.getItem('hcrm_col_config')); } catch(e) {}
+if (!colConfig || !colConfig.order || !colConfig.order.length) {
+  colConfig = { order: DEFAULT_COLS.map(c => c.key), labels: {} };
+}
+// Migrate: high_potential was renamed to negotiating
+if (colConfig.order.includes('high_potential')) {
+  colConfig.order = colConfig.order.map(k => k === 'high_potential' ? 'negotiating' : k);
+  delete colConfig.labels['high_potential'];
+  saveColConfig();
+}
+// Migrate: drop retired columns (Contacted / Quoted) from any saved layout
+if (colConfig.order.some(k => RETIRED_COLS.includes(k))) {
+  colConfig.order = colConfig.order.filter(k => !RETIRED_COLS.includes(k));
+  RETIRED_COLS.forEach(k => delete colConfig.labels[k]);
+  saveColConfig();
+}
+// Ensure any newly added default cols appear (on first load after update)
+DEFAULT_COLS.forEach(c => { if (!colConfig.order.includes(c.key)) colConfig.order.push(c.key); });
+
+function getCOLS() {
+  return colConfig.order.map(key => {
+    const def = DEFAULT_COLS.find(c => c.key === key);
+    return { key, label: colConfig.labels[key] || (def ? def.label : key) };
+  });
+}
+function saveColConfig() {
+  try { localStorage.setItem('hcrm_col_config', JSON.stringify(colConfig)); } catch(e) {}
+}
+function renameCol(key, newLabel) {
+  const trimmed = newLabel.trim();
+  const def = DEFAULT_COLS.find(c => c.key === key);
+  if (!trimmed || trimmed === (def ? def.label : key)) {
+    delete colConfig.labels[key];
+  } else {
+    colConfig.labels[key] = trimmed;
+  }
+  saveColConfig();
+}
+function moveCol(key, dir) {
+  const idx = colConfig.order.indexOf(key);
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= colConfig.order.length) return;
+  colConfig.order.splice(idx, 1);
+  colConfig.order.splice(newIdx, 0, key);
+  saveColConfig();
+  renderBoard();
+}
+const SRC = { fb_ads:'FB Ads', tiktok_ads:'TikTok', referral:'Referral', website:'Website', other:'Other' };
+
+let allLeads = [];
+let ctxLeadId = null;
+let dragLeadId = null;
+let dragOverCardId = null;
+let activeArea = '';
+let sortByAppt = false;
+
+// ── Data ──────────────────────────────────────────────────────────────────────
+
+async function fetchLeads() {
+  // no-store defeats mobile HTTP caching so every device pulls the live list
+  allLeads = await fetch('/leads', { cache: 'no-store' }).then(r => r.json());
+  renderBoard();
+}
+
+let _leadsPoll = null;
+async function loadLeads() {
+  await fetchLeads();
+  // Re-FETCH from the server every 30s (not just re-render) so mobile and
+  // desktop always converge to the latest data without a manual refresh.
+  if (_leadsPoll) clearInterval(_leadsPoll);
+  _leadsPoll = setInterval(fetchLeads, 30_000);
+  // Pull fresh data whenever the tab is brought back to the foreground
+  // (a phone waking from the background otherwise shows a stale snapshot).
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') fetchLeads();
+  });
+}
+
+// ── Flag logic ────────────────────────────────────────────────────────────────
+
+function shouldShowFlag(lead) {
+  if (!FLAG_STAGES.has(lead.status)) return false;
+  if (lead.followup_flag) return true;
+  // Auto: use the MOST RECENT of status_changed_at / updated_at / created_at
+  // so that a PATCH (which refreshes updated_at) suppresses the auto-flag for 2h
+  const ref = Math.max(
+    new Date(lead.status_changed_at || 0).getTime(),
+    new Date(lead.updated_at       || 0).getTime(),
+    new Date(lead.created_at       || 0).getTime()
+  );
+  return (Date.now() - ref) >= 2 * 60 * 60 * 1000;
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+
+function setArea(a) {
+  activeArea = a;
+  renderBoard();
+}
+
+function toggleApptSort() {
+  sortByAppt = !sortByAppt;
+  document.getElementById('sort-appt-btn').classList.toggle('active', sortByAppt);
+  renderBoard();
+}
+
+// Ascending by appointment date (closest first); leads with no date sink to the bottom.
+function apptTime(l) {
+  return l.appointment_at ? new Date(l.appointment_at).getTime() : Infinity;
+}
+
+function filteredLeads() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  return allLeads.filter(l => {
+    if (activeArea && l.area !== activeArea) return false;
+    if (q && !((l.full_name||'').toLowerCase().includes(q) || (l.phone||'').includes(q))) return false;
+    return true;
+  });
+}
+
+
+function renderBoard() {
+  const leads = filteredLeads();
+  const COLS = getCOLS();
+
+  const grouped = {};
+  COLS.forEach(c => grouped[c.key] = []);
+  leads.forEach(l => {
+    if (grouped[l.status] !== undefined) grouped[l.status].push(l);
+  });
+
+  // Optional view sort: order each column by appointment date, closest first
+  if (sortByAppt) {
+    COLS.forEach(c => grouped[c.key].sort((a, b) => apptTime(a) - apptTime(b)));
+  }
+
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+
+  COLS.forEach((col, colIdx) => {
+    const colLeads = grouped[col.key] || [];
+    const div = document.createElement('div');
+    div.className = `column col-${col.key}`;
+    const isFirst = colIdx === 0;
+    const isLast  = colIdx === COLS.length - 1;
+    div.innerHTML = `
+      <div class="col-header">
+        <button class="col-move" onclick="moveCol('${col.key}',-1)"${isFirst ? ' disabled' : ''} title="Move left">‹</button>
+        <input class="col-name-inp" value="${esc(col.label)}"
+               onclick="event.stopPropagation()"
+               onblur="renameCol('${col.key}',this.value)"
+               onkeydown="if(event.key==='Enter')this.blur()">
+        <span class="col-count">${colLeads.length}</span>
+        <button class="col-move" onclick="moveCol('${col.key}',1)"${isLast ? ' disabled' : ''} title="Move right">›</button>
+      </div>
+      <div class="col-body" data-status="${col.key}"
+           ondragover="onDragOver(event)"
+           ondragleave="onDragLeave(event)"
+           ondrop="onDrop(event,'${col.key}')">
+        ${colLeads.map(l => cardHtml(l)).join('')}
+        ${FLAG_STAGES.has(col.key) ? `<div class="add-card viewer-hide" onclick="openModal('${col.key}')">+ Add lead</div>` : ''}
+      </div>`;
+    board.appendChild(div);
+  });
+
+  // Attach drag + click + context menu listeners to cards
+  board.querySelectorAll('.card').forEach(el => {
+    const id = parseInt(el.dataset.id);
+    el.draggable = true;
+    // Tap/click → navigate to lead detail (works on mobile and desktop)
+    el.addEventListener('click', () => window.location.href = '/lead/' + id);
+    el.addEventListener('dragstart', e => onDragStart(e, id));
+    el.addEventListener('dragend', e => {
+      el.classList.remove('dragging');
+      document.querySelectorAll('.card.drag-target').forEach(c => c.classList.remove('drag-target'));
+      dragOverCardId = null;
+    });
+    el.addEventListener('dragover', e => {
+      dragOverCardId = id;
+      el.classList.add('drag-target');
+    });
+    el.addEventListener('dragleave', e => {
+      if (!el.contains(e.relatedTarget)) {
+        el.classList.remove('drag-target');
+        if (dragOverCardId === id) dragOverCardId = null;
+      }
+    });
+    el.addEventListener('contextmenu', e => onContextMenu(e, id));
+  });
+}
+
+const AREA_LABEL = {
+  sv_selangor: 'Site Visit, Selangor', sv_kl: 'Site Visit, KL', sv_border: 'Site Visit, Border',
+  office: 'Office',
+  // legacy values (pj/kl/border) are migrated to office server-side; label as Office if seen
+  pj: 'Office', kl: 'Office', border: 'Office',
+};
+
+function cardHtml(lead) {
+  const budget   = lead.budget ? `<span class="card-budget">RM ${esc(lead.budget)}</span>` : '';
+  const areaBadge = lead.area ? `<span class="area-badge area-${lead.area}">${AREA_LABEL[lead.area] || esc(lead.area)}</span>` : '';
+  const pic      = lead.assigned_to ? `<div class="card-pic">👤 ${esc(lead.assigned_to)}</div>` : '';
+  const wonVal   = (lead.status === 'won' && lead.deal_value) ? `<div class="card-won-val">RM ${Number(lead.deal_value).toLocaleString('en-MY')}</div>` : '';
+  const apptBadge = lead.appointment_at
+    ? `<div class="card-appt">📅 ${fmtAppt(lead.appointment_at)}</div>` : '';
+  const followUp = lead.follow_up_note
+    ? `<div class="card-followup msg" title="${esc(lead.follow_up_note)}">${esc(lead.follow_up_note)}</div>`
+    : (lead.last_follow_up
+        ? `<div class="card-followup">Last follow up: ${fmtFollowUp(lead.last_follow_up)}</div>`
+        : `<div class="card-followup none">no follow-up yet</div>`);
+  return `
+    <div class="card" data-id="${lead.id}" data-flag="${lead.followup_flag ? 1 : 0}">
+      <div class="card-name" title="${esc(lead.full_name)}">${esc(lead.full_name)}</div>
+      ${followUp}
+      ${wonVal}
+      <div class="card-meta">
+        ${budget}
+        ${areaBadge}
+      </div>
+      ${pic}
+      ${apptBadge}
+    </div>`;
+}
+
+function fmtFollowUp(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-MY', { day:'numeric', month:'short' });
+}
+
+// ── Drag & Drop ───────────────────────────────────────────────────────────────
+
+function onDragStart(e, id) {
+  dragLeadId = id;
+  dragOverCardId = null;
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(() => e.target.classList.add('dragging'), 0);
+}
+
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('drag-over');
+}
+
+function onDragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+
+let pendingDrop = null; // { leadId, status, prevStatus }
+
+async function onDrop(e, status) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  document.querySelectorAll('.card.drag-target').forEach(c => c.classList.remove('drag-target'));
+  if (window.__viewer || !dragLeadId) return;
+
+  const lead = allLeads.find(l => l.id === dragLeadId);
+  const savedDragId = dragLeadId;
+  const savedTargetId = dragOverCardId;
+  dragLeadId = null;
+  dragOverCardId = null;
+  if (!lead) return;
+
+  const curStatus = lead.status;
+
+  // Intra-column reorder
+  if (curStatus === status) {
+    if (savedTargetId !== null && savedTargetId !== savedDragId) {
+      // Find positions of same-status leads within allLeads, preserving global order
+      const statusIndices = [];
+      allLeads.forEach((l, i) => { if (l.status === status) statusIndices.push(i); });
+      const statusLeads = statusIndices.map(i => allLeads[i]);
+      const fi = statusLeads.findIndex(l => l.id === savedDragId);
+      const ti = statusLeads.findIndex(l => l.id === savedTargetId);
+      if (fi !== -1 && ti !== -1) {
+        const [moved] = statusLeads.splice(fi, 1);
+        statusLeads.splice(ti, 0, moved);
+        // Write reordered leads back into their original positions in allLeads
+        statusIndices.forEach((idx, i) => { allLeads[idx] = statusLeads[i]; });
+        renderBoard();
+        // Persist to server so all devices see the same order
+        fetch('/leads/bulk-sort', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ids: statusLeads.map(l => l.id) }),
+        }).catch(() => {});
+      }
+    }
+    return;
+  }
+
+  pendingDrop = { leadId: lead.id, status, prevStatus: lead.status };
+
+  if (status === 'site_visit') {
+    lead.status = status;
+    renderBoard();
+    document.getElementById('appt-input').value = '';
+    document.getElementById('appt-modal-bg').classList.add('open');
+    setTimeout(() => document.getElementById('appt-input').focus(), 50);
+    return;
+  }
+  if (status === 'lost') {
+    lead.status = status;
+    renderBoard();
+    document.getElementById('lost-reason-sel').value = '';
+    document.getElementById('lost-modal-bg').classList.add('open');
+    return;
+  }
+  if (status === 'won') {
+    lead.status = status;
+    renderBoard();
+    document.getElementById('won-value-input').value = '';
+    document.getElementById('won-modal-bg').classList.add('open');
+    setTimeout(() => document.getElementById('won-value-input').focus(), 50);
+    return;
+  }
+
+  lead.status = status;
+  renderBoard();
+  pendingDrop = null;
+  await commitStatusUpdate(lead.id, { status });
+}
+
+async function commitStatusUpdate(leadId, body) {
+  const res = await fetch(`/leads/${leadId}/status`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    showToast('Failed to update status', true);
+    await loadLeads();
+  } else {
+    const updated = await res.json();
+    const idx = allLeads.findIndex(l => l.id === updated.id);
+    if (idx >= 0) allLeads[idx] = updated;
+    renderBoard();
+  }
+}
+
+function revertPending() {
+  if (!pendingDrop) return;
+  const lead = allLeads.find(l => l.id === pendingDrop.leadId);
+  if (lead) lead.status = pendingDrop.prevStatus;
+  pendingDrop = null;
+  renderBoard();
+}
+
+async function confirmLost() {
+  const reason = document.getElementById('lost-reason-sel').value;
+  if (!reason) { showToast('Please pick a reason', true); return; }
+  document.getElementById('lost-modal-bg').classList.remove('open');
+  const { leadId } = pendingDrop;
+  pendingDrop = null;
+  await commitStatusUpdate(leadId, { status: 'lost', lost_reason: reason });
+}
+
+function cancelLost() {
+  document.getElementById('lost-modal-bg').classList.remove('open');
+  revertPending();
+}
+
+async function confirmWon() {
+  const val = parseInt(document.getElementById('won-value-input').value) || null;
+  document.getElementById('won-modal-bg').classList.remove('open');
+  const { leadId } = pendingDrop;
+  pendingDrop = null;
+  const body = { status: 'won' };
+  if (val) body.deal_value = val;
+  await commitStatusUpdate(leadId, body);
+}
+
+function cancelWon() {
+  document.getElementById('won-modal-bg').classList.remove('open');
+  revertPending();
+}
+
+// ── Appointment Modal ─────────────────────────────────────────────────────────
+
+let pendingApptOnly = null; // leadId when opened via right-click (no status change)
+
+function ctxSetAppointment() {
+  document.getElementById('ctx-menu').classList.remove('open');
+  const lead = allLeads.find(l => l.id === ctxLeadId);
+  if (!lead) return;
+  pendingApptOnly = ctxLeadId;
+  document.getElementById('appt-input').value = lead.appointment_at
+    ? lead.appointment_at.slice(0, 16) : '';
+  document.getElementById('appt-modal-bg').classList.add('open');
+  setTimeout(() => document.getElementById('appt-input').focus(), 50);
+}
+
+async function confirmAppt() {
+  const val = document.getElementById('appt-input').value;
+  document.getElementById('appt-modal-bg').classList.remove('open');
+  if (pendingApptOnly) {
+    const id = pendingApptOnly;
+    pendingApptOnly = null;
+    const res = await fetch(`/leads/${id}`, {
+      method: 'PATCH', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ appointment_at: val || null }),
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      const idx = allLeads.findIndex(l => l.id === updated.id);
+      if (idx >= 0) allLeads[idx] = updated;
+      renderBoard();
+    }
+  } else if (pendingDrop) {
+    const { leadId } = pendingDrop;
+    pendingDrop = null;
+    const body = { status: 'site_visit' };
+    if (val) body.appointment_at = val;
+    await commitStatusUpdate(leadId, body);
+  }
+}
+
+async function skipAppt() {
+  document.getElementById('appt-modal-bg').classList.remove('open');
+  if (pendingApptOnly) { pendingApptOnly = null; return; }
+  if (pendingDrop) {
+    const { leadId } = pendingDrop;
+    pendingDrop = null;
+    await commitStatusUpdate(leadId, { status: 'site_visit' });
+  }
+}
+
+async function removeAppt() {
+  document.getElementById('appt-modal-bg').classList.remove('open');
+  if (pendingApptOnly) {
+    const id = pendingApptOnly;
+    pendingApptOnly = null;
+    const res = await fetch(`/leads/${id}`, {
+      method: 'PATCH', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ appointment_at: null }),
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      const idx = allLeads.findIndex(l => l.id === updated.id);
+      if (idx >= 0) allLeads[idx] = updated;
+      renderBoard();
+    }
+  } else if (pendingDrop) {
+    const { leadId } = pendingDrop;
+    pendingDrop = null;
+    await commitStatusUpdate(leadId, { status: 'site_visit' });
+  }
+}
+
+function fmtAppt(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return d.toLocaleString('en-MY', { weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+}
+
+// ── Context Menu ──────────────────────────────────────────────────────────────
+
+function onContextMenu(e, id) {
+  e.preventDefault();
+  ctxLeadId = id;
+  const lead = allLeads.find(l => l.id === id);
+  const menu = document.getElementById('ctx-menu');
+
+  const hasFlag = lead && shouldShowFlag(lead);
+  document.getElementById('ctx-flag-icon').textContent  = '🚩';
+  document.getElementById('ctx-flag-label').textContent = 'Flag Follow-up';
+  // Only show "Flag Follow-up" when not already flagged — remove "Done" option
+  document.getElementById('ctx-flag-action').style.display =
+    lead && FLAG_STAGES.has(lead.status) && !hasFlag ? 'flex' : 'none';
+  document.getElementById('ctx-appt-action').style.display =
+    lead && lead.status === 'site_visit' ? 'flex' : 'none';
+  // "Move to Lost" — writers only, and not for a lead that's already Lost
+  document.getElementById('ctx-lost-action').style.display =
+    lead && !window.__viewer && lead.status !== 'lost' ? 'flex' : 'none';
+
+  menu.style.left = Math.min(e.clientX, window.innerWidth - 210) + 'px';
+  menu.style.top  = Math.min(e.clientY, window.innerHeight - 100) + 'px';
+  menu.classList.add('open');
+}
+
+document.getElementById('appt-modal-bg').addEventListener('click', e => { if (e.target === e.currentTarget) skipAppt(); });
+document.getElementById('lost-modal-bg').addEventListener('click', e => { if (e.target === e.currentTarget) cancelLost(); });
+document.getElementById('won-modal-bg').addEventListener('click', e => { if (e.target === e.currentTarget) cancelWon(); });
+document.getElementById('won-value-input').addEventListener('keydown', e => { if (e.key === 'Enter') confirmWon(); });
+document.addEventListener('click', () => document.getElementById('ctx-menu').classList.remove('open'));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.getElementById('ctx-menu').classList.remove('open'); });
+
+async function ctxToggleFlag() {
+  document.getElementById('ctx-menu').classList.remove('open');
+  const lead = allLeads.find(l => l.id === ctxLeadId);
+  if (!lead) return;
+
+  const newFlag = !shouldShowFlag(lead);
+  lead.followup_flag = newFlag;
+  renderBoard();
+
+  const res = await fetch(`/leads/${lead.id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ followup_flag: newFlag }),
+  });
+  if (res.ok) {
+    const updated = await res.json();
+    const idx = allLeads.findIndex(l => l.id === updated.id);
+    if (idx >= 0) allLeads[idx] = updated;
+    renderBoard();
+  }
+}
+
+function ctxView() {
+  document.getElementById('ctx-menu').classList.remove('open');
+  if (ctxLeadId) window.location.href = '/lead/' + ctxLeadId;
+}
+
+// Right-click → move straight to Lost, picking a reason (no drag needed).
+// Reuses the same Lost-reason modal + confirmLost()/cancelLost() as a drag-to-Lost.
+function ctxMoveToLost() {
+  document.getElementById('ctx-menu').classList.remove('open');
+  if (window.__viewer) return;
+  const lead = allLeads.find(l => l.id === ctxLeadId);
+  if (!lead || lead.status === 'lost') return;
+  // prevStatus is the current status; cancelLost() reverts to it (a no-op here
+  // since we don't optimistically move the card until Confirm).
+  pendingDrop = { leadId: lead.id, status: 'lost', prevStatus: lead.status };
+  document.getElementById('lost-reason-sel').value = '';
+  document.getElementById('lost-modal-bg').classList.add('open');
+}
+
+// ── Add Lead Modal ────────────────────────────────────────────────────────────
+
+function openModal(preStatus) {
+  ['f-name','f-phone','f-budget','f-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-source').value = '';
+  document.getElementById('f-area').value = '';
+  document.querySelectorAll('#f-type-wrap input[type=checkbox]').forEach(cb => cb.checked = false);
+  document.getElementById('f-status').value = preStatus || 'new';
+  document.getElementById('modal-bg').classList.add('open');
+  document.getElementById('f-name').focus();
+}
+
+function closeModal() {
+  document.getElementById('modal-bg').classList.remove('open');
+}
+
+document.getElementById('modal-bg').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+async function saveLead() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { alert('Name is required'); return; }
+  const body = {
+    full_name:      name,
+    phone:          document.getElementById('f-phone').value.trim() || null,
+    budget:         document.getElementById('f-budget').value.trim() || null,
+    source_channel: document.getElementById('f-source').value || null,
+    area:           document.getElementById('f-area').value || null,
+    project_type:   Array.from(document.querySelectorAll('#f-type-wrap input:checked')).map(cb=>cb.value).join(',')||null,
+    request_notes:  document.getElementById('f-notes').value.trim() || null,
+  };
+  const res = await fetch('/leads', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+  if (!res.ok) { const e = await res.json(); alert(e.detail || 'Error saving'); return; }
+  const lead = await res.json();
+
+  // Move to chosen stage if not new
+  const targetStatus = document.getElementById('f-status').value;
+  if (targetStatus && targetStatus !== 'new') {
+    await fetch(`/leads/${lead.id}/status`, {
+      method: 'PATCH', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ status: targetStatus }),
+    });
+    lead.status = targetStatus;
+  }
+
+  allLeads.unshift(lead);
+  closeModal();
+  renderBoard();
+  showToast('Lead added ✓');
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function timeAgo(s) {
+  if (!s) return '';
+  const diff = Date.now() - new Date(s).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 60)   return m + 'm ago';
+  const h = Math.floor(m / 60);
+  if (h < 24)   return h + 'h ago';
+  const d = Math.floor(h / 24);
+  if (d < 30)   return d + 'd ago';
+  return Math.floor(d/30) + 'mo ago';
+}
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function showToast(msg, isErr=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isErr ? ' err' : '');
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 2500);
+}
+
+loadLeads();
+</script>
+<script>
+(async()=>{
+  try{
+    const me=await fetch('/me').then(r=>r.json());
+    window.__viewer=me.role==='viewer';
+    if(window.__viewer){
+      document.body.classList.add('viewer');
+      document.querySelectorAll('.viewer-hide').forEach(el=>el.style.display='none');
+      const sp=document.querySelector('nav .spacer');
+      if(sp){const b=document.createElement('span');b.textContent='View Only';b.style.cssText='background:#fef3c7;color:#b45309;font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;white-space:nowrap';sp.after(b);}
+    }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>

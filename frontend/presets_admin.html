@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Melvin Gan Carpentry — Library</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@200&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f6fa; color: #1a1a2e; }
+  nav { background: #f0ebe1; padding: 16px 32px; display: flex; align-items: center; gap: 24px; }
+  .nav-logo { font-family: 'Raleway', sans-serif; font-weight: 200; font-size: 19px; letter-spacing: 4px; color: #1a1a2e; white-space: nowrap; flex-shrink: 0; text-decoration: none; }
+  nav a { color: #7a6352; text-decoration: none; font-size: 14px; }
+  nav a:hover, nav a.active { color: #1a1a2e; }
+  nav .spacer { flex: 1; }
+  nav .user-badge { font-size: 12px; color: #a08868; }
+  nav button.logout { background: none; border: 1px solid #c9b9a5; color: #7a6352; padding: 4px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+  nav button.logout:hover { border-color: #8a7060; color: #1a1a2e; }
+  @media (max-width: 640px) {
+    nav { padding: 8px 14px; gap: 8px; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+    nav::-webkit-scrollbar { display: none; }
+    .nav-logo { font-size: 15px; letter-spacing: 3px; }
+    nav a { font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+    nav .spacer { display: none; }
+    nav button.logout { white-space: nowrap; flex-shrink: 0; font-size: 11px; padding: 4px 8px; }
+  }
+  .main { padding: 28px 32px; max-width: 940px; margin: 0 auto; }
+  .page-title { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+  .page-sub { font-size: 12px; color: #888; margin-bottom: 20px; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 6px; margin-bottom: 18px; border-bottom: 2px solid #eee; }
+  .tab { padding: 10px 22px; font-size: 14px; font-weight: 700; color: #999; cursor: pointer; border: none; background: none; font-family: inherit; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+  .tab:hover { color: #4a3b30; }
+  .tab.active { color: #4a3b30; border-bottom-color: #4a3b30; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .card { background: white; border-radius: 12px; padding: 22px 26px; box-shadow: 0 1px 4px rgba(0,0,0,.06); margin-bottom: 14px; }
+  .card h2 { font-size: 13px; font-weight: 700; color: #4a3b30; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 12px; }
+  .btn { padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; text-decoration: none; display: inline-block; }
+  .btn-primary { background: #4a3b30; color: white; }
+  .btn-primary:hover { background: #33291f; }
+  .btn-ghost { background: #faf7f2; color: #6b5544; }
+  .btn-ghost:hover { background: #f0ebe1; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 12px; }
+  .stat { background: #faf7f2; border-radius: 10px; padding: 14px 16px; }
+  .stat .n { font-size: 22px; font-weight: 800; color: #4a3b30; }
+  .stat .l { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
+
+  .tree { font-size: 13px; line-height: 1.9; margin-top: 12px; }
+  .tree .a { font-weight: 700; color: #4a3b30; }
+  .tree .s { color: #666; padding-left: 20px; }
+  .tree .set { padding-left: 40px; color: #333; }
+  .tree .cnt { color: #8a7364; font-size: 11px; margin-left: 6px; }
+
+  table.prod { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 12px; }
+  table.prod th { text-align: left; padding: 7px 10px; background: #faf7f2; color: #4a3b30; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; position: sticky; top: 0; }
+  table.prod td { padding: 6px 10px; border-bottom: 1px solid #f2f2f7; }
+  table.prod tr:hover td { background: #fafafe; }
+  .prod-wrap { max-height: 460px; overflow-y: auto; border: 1px solid #f0f0f5; border-radius: 8px; margin-top: 12px; }
+  .price { text-align: right; font-weight: 600; white-space: nowrap; }
+  .filter-inp { padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; width: 240px; font-family: inherit; }
+  table.prod td.act { white-space: nowrap; display: flex; gap: 6px; }
+  .p-edit-inp { width: 100%; padding: 5px 7px; border: 1px solid #8a7364; border-radius: 6px; font-size: 12.5px; font-family: inherit; }
+  .p-edit-inp:focus { outline: none; border-color: #4a3b30; }
+  .btn-xs { padding: 4px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer; border: 1px solid #ddd; background: #fff; color: #555; font-family: inherit; }
+  .btn-xs:hover { background: #f5f5f5; }
+  .btn-xs.primary { background: #4a3b30; color: #fff; border-color: #4a3b30; }
+  .btn-xs.primary:hover { background: #33291f; }
+  .btn-xs.danger { color: #ef4444; border-color: #fca5a5; }
+  .btn-xs.danger:hover { background: #fef2f2; }
+
+  /* Inline preset editor (styled like the quotation form) */
+  .ped-toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 4px 0 16px; }
+  .ped-list { display: flex; flex-direction: column; gap: 12px; }
+  .ped-cat { background: #faf7f2; border-radius: 12px; padding: 12px 16px 14px; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
+  .ped-cat-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .ped-cat-name { flex: 1; font-size: 15px; font-weight: 800; color: #3a2e24; border: 1px solid transparent; background: transparent; padding: 5px 8px; border-radius: 7px; max-width: 340px; font-family: inherit; }
+  .ped-cat-name:hover { background: #fff; }
+  .ped-cat-name:focus { outline: none; border-color: #d3c3ae; background: #fff; }
+  .ped-groups { display: flex; flex-direction: column; gap: 10px; }
+  .ped-grp { background: #fff; border: 1px solid #efe9fb; border-radius: 10px; padding: 8px 12px 10px; }
+  .ped-grp-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .ped-grp-name { flex: 1; font-size: 13px; font-weight: 700; color: #4a3b30; border: 1px solid transparent; background: transparent; padding: 4px 8px; border-radius: 6px; max-width: 300px; font-family: inherit; }
+  .ped-grp-name:hover { background: #faf7f2; }
+  .ped-grp-name:focus { outline: none; border-color: #d3c3ae; background: #fff; }
+  .ped-tbl { width: 100%; border-collapse: collapse; margin-top: 4px; }
+  .ped-tbl th { font-size: 10px; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: .5px; padding: 4px 6px; text-align: left; border-bottom: 1.5px solid #f0f0f5; }
+  .ped-tbl th.r { text-align: right; }
+  .ped-tbl td { padding: 3px 4px; }
+  .ped-tbl input { width: 100%; padding: 6px 8px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 12.5px; font-family: inherit; }
+  .ped-tbl input:focus { outline: none; border-color: #8a7364; background: #fdfbf7; }
+  .ped-add { background: none; border: 1.5px dashed #d3c3ae; color: #6b5544; padding: 5px 12px; border-radius: 7px; font-size: 12px; cursor: pointer; font-weight: 600; margin-top: 8px; font-family: inherit; }
+  .ped-add:hover { background: #faf7f2; }
+  .ped-add.ghost { border-style: dashed; margin-top: 10px; }
+  .ped-x { background: none; border: none; color: #c9a9a9; font-size: 12px; font-weight: 700; cursor: pointer; padding: 3px 8px; border-radius: 6px; font-family: inherit; }
+  .ped-x:hover { color: #ef4444; background: #fff0f0; }
+  .ped-del { background: none; border: none; color: #ddd; font-size: 16px; cursor: pointer; padding: 0 4px; line-height: 1; }
+  .ped-del:hover { color: #ef4444; }
+  .ped-empty { color: #aaa; font-size: 13px; padding: 24px; text-align: center; }
+
+  /* Packages list */
+  .pkg-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+  .pkg-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid #f0f0f5; border-radius: 10px; }
+  .pkg-item:hover { background: #fafafe; }
+  .pkg-item .pk-name { font-size: 14px; font-weight: 700; color: #1a1a2e; }
+  .pkg-item .pk-price { font-size: 12.5px; font-weight: 700; color: #4a3b30; background: #faf7f2; border: 1px solid #ddd0fa; border-radius: 8px; padding: 1px 8px; margin-left: 6px; white-space: nowrap; }
+  .pkg-item .pk-meta { font-size: 11.5px; color: #8a7364; }
+  .pkg-item .grow { flex: 1; }
+  .pkg-item .btn-sm { padding: 6px 14px; border-radius: 7px; font-size: 12.5px; font-weight: 600; cursor: pointer; text-decoration: none; border: 1px solid #ddd0fa; background: #faf7f2; color: #4a3b30; font-family: inherit; }
+  .pkg-item .btn-sm:hover { background: #f0ebe1; }
+  .pkg-item .btn-del { border-color: #fecaca; background: #fff; color: #ef4444; }
+  .pkg-item .btn-del:hover { background: #fff0f0; }
+  .pkg-cat-group { margin-bottom: 18px; }
+  .pkg-cat-title { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; color: #4a3b30; text-transform: uppercase; letter-spacing: .5px; padding: 4px 2px 8px; border-bottom: 2px solid #f0eaff; margin-bottom: 8px; }
+  .pkg-cat-title .pk-count { background: #f0ebe1; color: #4a3b30; border-radius: 10px; padding: 1px 8px; font-size: 11px; letter-spacing: 0; }
+  .pkg-cat-new { font-size: 12px; font-weight: 700; color: #6b5544; text-decoration: none; background: #faf7f2; padding: 4px 12px; border-radius: 7px; border: 1px solid #ddd0fa; text-transform: none; letter-spacing: 0; }
+  .pkg-cat-new:hover { background: #f0ebe1; }
+  .pkg-item .pk-drag { cursor: grab; color: #cbbfae; font-size: 15px; user-select: none; padding: 0 2px; line-height: 1; }
+  .pkg-item .pk-drag:active { cursor: grabbing; }
+  .pkg-item.dragging { opacity: .4; }
+  .pkg-item.drop-above { border-top: 2.5px solid #6b5544; }
+  .pkg-item.drop-below { border-bottom: 2.5px solid #6b5544; }
+  .pkg-cat-group.drop-target { outline: 2px dashed #d3c3ae; outline-offset: 4px; border-radius: 10px; }
+  .pk-name-inp { font-size: 14px; font-weight: 700; color: #1a1a2e; border: 1px solid #d3c3ae; border-radius: 6px; padding: 2px 6px; font-family: inherit; background: #fdfbf7; min-width: 180px; }
+  .pk-name-edit { cursor: text; border-bottom: 1px dashed transparent; }
+  .pkg-item:hover .pk-name-edit { border-bottom-color: #d3c3ae; }
+  .pk-cat-edit { cursor: text; border-bottom: 1px dashed transparent; }
+  .pkg-cat-title:hover .pk-cat-edit { border-bottom-color: #cbbfae; }
+  .pk-cat-inp { font-size: 12px; font-weight: 800; color: #4a3b30; text-transform: uppercase; letter-spacing: .5px; border: 1px solid #d3c3ae; border-radius: 6px; padding: 2px 6px; font-family: inherit; background: #fdfbf7; }
+
+  /* Product autocomplete inside the preset editor */
+  .pi-ac { position: absolute; background: #fff; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 8px 28px rgba(0,0,0,.14); z-index: 900; max-height: 240px; overflow-y: auto; display: none; }
+  .pi-ac-item { padding: 7px 12px; cursor: pointer; display: flex; align-items: baseline; gap: 8px; border-bottom: 1px solid #f8f8f8; }
+  .pi-ac-item:last-child { border-bottom: none; }
+  .pi-ac-item:hover, .pi-ac-item.hi { background: #f0ebe1; }
+  .pi-ac-item .d { flex: 1; font-size: 12px; color: #111; }
+  .pi-ac-item .t { font-size: 10px; color: #aaa; white-space: nowrap; }
+  .pi-ac-item .p { font-size: 12px; font-weight: 700; color: #4a3b30; white-space: nowrap; }
+
+  .hint { font-size: 11px; color: #888; margin-top: 12px; }
+  .hint code { background: #f3f4f6; padding: 1px 5px; border-radius: 4px; }
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #10b981; color: white; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; display: none; z-index: 500; }
+  .toast.error { background: #ef4444; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">melvin gan carpentry</a>
+  <a href="/">Dashboard</a>
+  <a href="/leads-page">All Leads</a>
+  <a href="/quotes-page">Quotations</a>
+  <a href="/checklists-page">Checklists</a>
+  <a href="/admin/presets" class="active">Library</a>
+  <div class="spacer"></div>
+  <form method="POST" action="/logout" style="margin:0"><button class="logout" type="submit">Sign out</button></form>
+</nav>
+
+<div class="main">
+  <div class="page-title">Library</div>
+  <div class="page-sub">Manage the product price list and the quotation preset sets. Edit in bulk by downloading the Excel file, changing it, and uploading it back.</div>
+
+  <div class="tabs">
+    <button class="tab active" id="tab-products" onclick="showTab('products')">📦 Products</button>
+    <button class="tab" id="tab-presets" onclick="showTab('presets')">🎁 Preset Sets</button>
+    <button class="tab" id="tab-packages" onclick="showTab('packages')">🧩 Packages</button>
+  </div>
+
+  <!-- ============ PRODUCTS ============ -->
+  <div class="panel active" id="panel-products">
+    <div class="card">
+      <h2>Product Price List</h2>
+      <div class="stat-grid">
+        <div class="stat"><div class="n" id="p-total">–</div><div class="l">Products</div></div>
+        <div class="stat"><div class="n" id="p-rooms">–</div><div class="l">Rooms</div></div>
+        <div class="stat"><div class="n" id="p-types">–</div><div class="l">Material Types</div></div>
+        <div class="stat"><div class="n" id="p-inactive">–</div><div class="l">Inactive</div></div>
+      </div>
+      <div class="row" style="margin-top:16px;justify-content:space-between">
+        <input class="filter-inp" id="p-filter" placeholder="Filter by name / room / type…" oninput="renderProducts()">
+        <button class="btn btn-primary" onclick="prodShowAdd()">+ Add Product</button>
+      </div>
+      <p style="font-size:12px;color:#888;margin-top:8px;line-height:1.5">
+        Edits here save to the system instantly — anyone downloading <code>products.xlsx</code> always gets the latest version.
+      </p>
+      <div class="prod-wrap">
+        <table class="prod">
+          <thead><tr><th>Type</th><th>Room</th><th>Description</th><th>UOM</th><th class="price">Price (RM)</th><th style="width:130px"></th></tr></thead>
+          <tbody id="p-rows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Bulk Edit via Excel</h2>
+      <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:14px">
+        Download the price list as an <strong>.xlsx</strong>, edit prices / rename items / add rows,
+        then upload it back. <strong>Uploading replaces the entire product list.</strong>
+        Existing quotations already made are not affected.
+      </p>
+      <div class="row">
+        <a class="btn btn-ghost" href="/products/export-xlsx">⬇ Download products.xlsx</a>
+        <label class="btn btn-primary" style="cursor:pointer">
+          ⬆ Upload &amp; Replace
+          <input type="file" id="p-upload" accept=".xlsx" style="display:none" onchange="uploadProducts()">
+        </label>
+      </div>
+      <div class="hint">
+        Columns expected: <code>Type</code>, <code>Room</code>, <code>Description</code>, <code>UOM</code>, <code>Price</code>, <code>Active</code>.<br>
+        <code>Active</code> = <code>Y</code> to show it in the quotation product picker; leave blank to hide.
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PRESETS ============ -->
+  <div class="panel" id="panel-presets">
+    <div class="card">
+      <h2>Preset Sets</h2>
+      <div class="stat-grid">
+        <div class="stat"><div class="n" id="s-areas">–</div><div class="l">Categories</div></div>
+        <div class="stat"><div class="n" id="s-subs">–</div><div class="l">Groups</div></div>
+        <div class="stat"><div class="n" id="s-items">–</div><div class="l">Line Items</div></div>
+        <div class="stat"><div class="n" id="s-avg">–</div><div class="l">Items / Group</div></div>
+      </div>
+      <p style="font-size:12.5px;color:#666;line-height:1.6;margin:14px 0 4px">
+        Edit categories, groups and items below just like a quotation. Click a name to rename, use ✕ to delete a
+        whole category or group, then press <strong>Save Changes</strong>. These appear under 🎁 Insert Preset when building a quote.
+      </p>
+      <div class="ped-toolbar">
+        <button class="btn btn-ghost" onclick="pedAddCat()">➕ Add Category</button>
+        <button class="btn btn-primary" onclick="savePresetEditor()">💾 Save Changes</button>
+        <button class="btn" style="background:#f3f4f6;color:#555" onclick="loadPresetEditor()">↺ Reload</button>
+      </div>
+      <div class="ped-list" id="ped-list"></div>
+    </div>
+
+    <div class="card">
+      <h2>Bulk Edit via Excel</h2>
+      <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:14px">
+        Download the current sets as an <strong>.xlsx</strong>, edit prices / rename sets / add
+        rows, then upload it back. <strong>Uploading replaces the entire preset library.</strong>
+      </p>
+      <div class="row">
+        <a class="btn btn-ghost" href="/presets/export-xlsx">⬇ Download presets.xlsx</a>
+        <label class="btn btn-primary" style="cursor:pointer">
+          ⬆ Upload &amp; Replace
+          <input type="file" id="f-upload" accept=".xlsx" style="display:none" onchange="uploadPresets()">
+        </label>
+      </div>
+      <div class="hint">
+        Columns expected: <code>Area</code>, <code>TargetRoom</code>, <code>SubArea</code>, <code>Set</code>, <code>RunFt</code>, <code>Category</code>, <code>Description</code>, <code>UOM</code>, <code>IsPerFt</code>, <code>Qty</code>, <code>UnitPrice</code>.<br>
+        <code>IsPerFt</code> = <code>Y</code> means quantity multiplies by the Set's run-length prompt at insert time.
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PACKAGES ============ -->
+  <div class="panel" id="panel-packages">
+    <div class="card">
+      <h2>Quotation Packages</h2>
+      <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:14px">
+        Reusable full-quotation templates saved from the quote form. Editing one opens the quotation editor
+        (without client details); saving writes back to the same package.
+      </p>
+      <div class="row" style="margin-bottom:12px;gap:10px;align-items:center">
+        <a class="btn btn-primary" href="/new-quote?package=new">➕ New Package</a>
+        <button class="btn btn-ghost" onclick="pkgAddCategory()">➕ New category</button>
+        <input class="filter-inp" id="pkg-search" placeholder="🔍 Search packages by name…" oninput="renderPackages()" style="flex:1;min-width:180px;margin:0">
+      </div>
+      <p style="font-size:12px;color:#8a7364;margin:-4px 0 12px">Drag <b>⋮⋮</b> to reorder or move a package between categories · click a package name to rename.</p>
+      <div class="pkg-list" id="pkg-list"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function showTab(name) {
+  ['products', 'presets', 'packages'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('active', name === t);
+    document.getElementById('panel-' + t).classList.toggle('active', name === t);
+  });
+  location.hash = name;
+}
+
+// ---- Products ----
+let PRODUCTS = [];
+
+let pEditId = null;   // product id being edited inline
+let pAdding = false;  // whether the "add product" row is showing
+
+async function loadProducts() {
+  PRODUCTS = await fetch('/products/all').then(r => r.json());
+  prodStats();
+  renderProducts();
+  pedSyncAllDetails();  // preset captions may have rendered before products loaded
+}
+
+function prodStats() {
+  const rooms = new Set(PRODUCTS.map(p => p.room).filter(Boolean));
+  const types = new Set(PRODUCTS.map(p => p.type).filter(Boolean));
+  document.getElementById('p-total').textContent = PRODUCTS.length;
+  document.getElementById('p-rooms').textContent = rooms.size;
+  document.getElementById('p-types').textContent = types.size;
+  document.getElementById('p-inactive').textContent = PRODUCTS.filter(p => !p.is_active).length;
+}
+
+function renderProducts() {
+  const q = document.getElementById('p-filter').value.toLowerCase();
+  const list = PRODUCTS.filter(p =>
+    !q || (p.description || '').toLowerCase().includes(q)
+       || (p.room || '').toLowerCase().includes(q)
+       || (p.type || '').toLowerCase().includes(q)
+  );
+  const rows = list.map(p => p.id === pEditId ? pEditRow(p) : pViewRow(p)).join('');
+  const addRow = pAdding ? pAddRow() : '';
+  const empty = '<tr><td colspan="6" style="color:#aaa;padding:20px;text-align:center">No products.</td></tr>';
+  document.getElementById('p-rows').innerHTML = (rows || (addRow ? '' : empty)) + addRow;
+}
+
+function pViewRow(p) {
+  return `<tr style="${p.is_active ? '' : 'opacity:.45'}">
+    <td>${esc(p.type)}</td>
+    <td>${esc(p.room)}</td>
+    <td>${esc(p.description)}${p.is_active ? '' : ' <span style="font-size:10px;color:#ef4444">(hidden)</span>'}${p.details ? `<div style="font-size:11px;color:#8a7364;font-style:italic;margin-top:2px;white-space:pre-wrap">${esc(p.details)}</div>` : ''}</td>
+    <td>${esc(p.uom || '')}</td>
+    <td class="price">${Number(p.price).toLocaleString('en-MY', {minimumFractionDigits: 2})}</td>
+    <td class="act">
+      <button class="btn-xs" onclick="prodStartEdit(${p.id})">Edit</button>
+      <button class="btn-xs danger" onclick="prodDelete(${p.id})">Delete</button>
+    </td></tr>`;
+}
+
+function pEditRow(p) {
+  return `<tr style="background:#faf7f2">
+    <td><input class="p-edit-inp" id="pe-type" value="${esc(p.type)}"></td>
+    <td><input class="p-edit-inp" id="pe-room" value="${esc(p.room)}"></td>
+    <td><input class="p-edit-inp" id="pe-desc" value="${esc(p.description)}">
+        <textarea class="p-edit-inp" id="pe-details" rows="2" placeholder="Details (optional) — e.g. hinges, finish, thickness" style="margin-top:5px;font-size:12px;color:#6b5544;resize:vertical">${esc(p.details || '')}</textarea></td>
+    <td><input class="p-edit-inp" id="pe-uom" value="${esc(p.uom || '')}"></td>
+    <td><input class="p-edit-inp" id="pe-price" type="number" step="0.01" value="${p.price}" style="text-align:right"></td>
+    <td class="act">
+      <button class="btn-xs primary" onclick="prodSaveEdit(${p.id})">Save</button>
+      <button class="btn-xs" onclick="prodCancelEdit()">Cancel</button>
+    </td></tr>`;
+}
+
+function pAddRow() {
+  return `<tr style="background:#f0fdf4">
+    <td><input class="p-edit-inp" id="pa-type" placeholder="MFC"></td>
+    <td><input class="p-edit-inp" id="pa-room" placeholder="Kitchen"></td>
+    <td><input class="p-edit-inp" id="pa-desc" placeholder="Description">
+        <textarea class="p-edit-inp" id="pa-details" rows="2" placeholder="Details (optional) — e.g. hinges, finish, thickness" style="margin-top:5px;font-size:12px;color:#6b5544;resize:vertical"></textarea></td>
+    <td><input class="p-edit-inp" id="pa-uom" placeholder="Fr"></td>
+    <td><input class="p-edit-inp" id="pa-price" type="number" step="0.01" value="0" style="text-align:right"></td>
+    <td class="act">
+      <button class="btn-xs primary" onclick="prodSaveNew()">Add</button>
+      <button class="btn-xs" onclick="prodCancelAdd()">Cancel</button>
+    </td></tr>`;
+}
+
+function prodStartEdit(id) { pEditId = id; pAdding = false; renderProducts(); }
+function prodCancelEdit() { pEditId = null; renderProducts(); }
+function prodShowAdd() {
+  pAdding = true; pEditId = null; renderProducts();
+  document.getElementById('pa-type')?.focus();
+}
+function prodCancelAdd() { pAdding = false; renderProducts(); }
+
+function _readRow(prefix) {
+  return {
+    type: document.getElementById(prefix + '-type').value.trim(),
+    room: document.getElementById(prefix + '-room').value.trim(),
+    description: document.getElementById(prefix + '-desc').value.trim(),
+    details: document.getElementById(prefix + '-details').value.trim() || null,
+    uom: document.getElementById(prefix + '-uom').value.trim() || null,
+    price: parseFloat(document.getElementById(prefix + '-price').value) || 0,
+    is_active: true,
+  };
+}
+
+async function prodSaveEdit(id) {
+  const body = _readRow('pe');
+  if (!body.type || !body.description) { toast('Type and Description are required', true); return; }
+  const res = await fetch('/products/' + id, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (res.ok) {
+    const updated = await res.json();
+    const idx = PRODUCTS.findIndex(p => p.id === id);
+    if (idx >= 0) PRODUCTS[idx] = updated;
+    pEditId = null; prodStats(); renderProducts(); toast('Saved ✓');
+  } else { toast(await errMsg(res, 'Save failed'), true); }
+}
+
+async function prodSaveNew() {
+  const body = _readRow('pa');
+  if (!body.type || !body.description) { toast('Type and Description are required', true); return; }
+  const res = await fetch('/products', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (res.ok) {
+    PRODUCTS.push(await res.json());
+    pAdding = false; prodStats(); renderProducts(); toast('Product added ✓');
+  } else { toast(await errMsg(res, 'Add failed'), true); }
+}
+
+async function prodDelete(id) {
+  const p = PRODUCTS.find(x => x.id === id);
+  if (!confirm(`Delete "${p ? p.description : 'this product'}"?`)) return;
+  const res = await fetch('/products/' + id, { method: 'DELETE' });
+  if (res.ok || res.status === 204) {
+    PRODUCTS = PRODUCTS.filter(x => x.id !== id);
+    prodStats(); renderProducts(); toast('Deleted ✓');
+  } else { toast(await errMsg(res, 'Delete failed'), true); }
+}
+
+async function uploadProducts() {
+  const inp = document.getElementById('p-upload');
+  const file = inp.files[0];
+  if (!file) return;
+  if (!confirm(`Upload "${file.name}" and REPLACE the entire product list?`)) { inp.value = ''; return; }
+  const fd = new FormData();
+  fd.append('file', file);
+  const res = await fetch('/products/import-xlsx', { method: 'POST', body: fd });
+  if (res.ok) {
+    const r = await res.json();
+    toast(`Loaded ${r.products} products ✓`);
+    loadProducts();
+  } else {
+    toast(await errMsg(res, 'Upload failed'), true);
+  }
+  inp.value = '';
+}
+
+// ---- Presets (inline editor, flattened Category → Group → Items) ----
+// Details are NOT stored on presets — they always mirror the matching product SKU.
+function prodDetailsByDesc(desc) {
+  const key = (desc || '').trim().toLowerCase();
+  if (!key) return '';
+  const m = (PRODUCTS || []).find(p => (p.description || '').trim().toLowerCase() === key && p.details);
+  return m ? m.details : '';
+}
+// Refresh the read-only detail caption for one preset-item row from the live product list.
+function pedSyncDetail(input) {
+  const tr = input.closest('tr'); if (!tr) return;
+  const cap = tr.querySelector('.pi-details-cap'); if (!cap) return;
+  const d = prodDetailsByDesc(input.value);
+  cap.textContent = d;
+  cap.style.display = d ? 'block' : 'none';
+}
+// Re-sync every rendered preset-item caption (e.g. after products finish loading).
+function pedSyncAllDetails() {
+  document.querySelectorAll('#ped-list .pi-desc').forEach(pedSyncDetail);
+}
+function pedItemRow(it = {}) {
+  const det = prodDetailsByDesc(it.description);
+  return `<tr>
+    <td><input class="pi-desc" value="${esc(it.description)}" placeholder="Item description">
+        <div class="pi-details-cap" style="font-size:11px;color:#8a7364;font-style:italic;margin-top:3px;white-space:pre-wrap;display:${det ? 'block' : 'none'}">${esc(det)}</div></td>
+    <td><input class="pi-uom" value="${esc(it.uom)}" placeholder="Fr"></td>
+    <td><input class="pi-qty" type="number" step="0.5" value="${it.qty ?? 1}" style="text-align:right"></td>
+    <td><input class="pi-price" type="number" step="1" value="${it.unit_price ?? 0}" style="text-align:right"></td>
+    <td style="text-align:center"><button class="ped-del" title="Remove item" onclick="this.closest('tr').remove()">×</button></td>
+  </tr>`;
+}
+function pedGroupBlock(g = {}) {
+  const items = g.items || [];
+  return `<div class="ped-grp">
+    <div class="ped-grp-head">
+      <input class="ped-grp-name" value="${esc(g.name)}" placeholder="Group name (e.g. Wet Kitchen)">
+      <button class="ped-x" title="Delete this group" onclick="pedDelGrp(this)">✕ Group</button>
+    </div>
+    <table class="ped-tbl">
+      <thead><tr><th>Description</th><th style="width:64px">UOM</th><th class="r" style="width:64px">Qty</th><th class="r" style="width:110px">Unit Price</th><th style="width:30px"></th></tr></thead>
+      <tbody>${items.map(pedItemRow).join('')}</tbody>
+    </table>
+    <button class="ped-add" onclick="pedAddItem(this)">＋ Add Item</button>
+  </div>`;
+}
+function pedCatBlock(c = {}) {
+  const subs = c.subs || [];
+  return `<div class="ped-cat">
+    <div class="ped-cat-head">
+      <input class="ped-cat-name" value="${esc(c.area)}" placeholder="Category (e.g. Kitchen)">
+      <button class="ped-x" title="Delete this category" onclick="pedDelCat(this)">✕ Category</button>
+    </div>
+    <div class="ped-groups">${subs.map(pedGroupBlock).join('')}</div>
+    <button class="ped-add ghost" onclick="pedAddGroup(this)">➕ Add Group</button>
+  </div>`;
+}
+
+async function loadPresetEditor() {
+  let tree = [];
+  try { tree = await fetch('/presets').then(r => r.json()); } catch (e) {}
+  // Flatten Area → Sub → Set → Items into Category → Group → Items
+  const model = (tree || []).map(a => ({
+    area: a.area,
+    subs: (a.subs || []).map(sub => ({
+      name: sub.name,
+      items: (sub.sets || []).reduce((arr, s) => arr.concat((s.items || []).map(it => ({
+        description: it.description, uom: it.uom, qty: it.qty, unit_price: it.unit_price,
+      }))), []),
+    })),
+  }));
+  const list = document.getElementById('ped-list');
+  list.innerHTML = model.length
+    ? model.map(pedCatBlock).join('')
+    : '<div class="ped-empty">No presets yet. Click “➕ Add Category” to start.</div>';
+  updatePresetStats(model);
+}
+
+function updatePresetStats(model) {
+  let groups = 0, items = 0;
+  model.forEach(c => (c.subs || []).forEach(g => { groups++; items += (g.items || []).length; }));
+  document.getElementById('s-areas').textContent = model.length;
+  document.getElementById('s-subs').textContent  = groups;
+  document.getElementById('s-items').textContent = items;
+  document.getElementById('s-avg').textContent   = groups ? (items / groups).toFixed(1) : '0';
+}
+
+function pedAddCat() {
+  const list = document.getElementById('ped-list');
+  const empty = list.querySelector('.ped-empty');
+  if (empty) empty.remove();
+  list.insertAdjacentHTML('beforeend', pedCatBlock({ area: '', subs: [{ name: '', items: [{}] }] }));
+  list.lastElementChild.querySelector('.ped-cat-name').focus();
+}
+function pedAddGroup(btn) {
+  const groups = btn.closest('.ped-cat').querySelector('.ped-groups');
+  groups.insertAdjacentHTML('beforeend', pedGroupBlock({ name: '', items: [{}] }));
+  groups.lastElementChild.querySelector('.ped-grp-name').focus();
+}
+function pedAddItem(btn) {
+  const tbody = btn.closest('.ped-grp').querySelector('tbody');
+  tbody.insertAdjacentHTML('beforeend', pedItemRow({}));
+  tbody.lastElementChild.querySelector('.pi-desc').focus();
+}
+function pedDelCat(btn) {
+  const cat = btn.closest('.ped-cat');
+  const name = cat.querySelector('.ped-cat-name').value.trim() || 'this category';
+  if (cat.querySelector('.pi-desc') && !confirm(`Delete category "${name}" and all its groups/items?`)) return;
+  cat.remove();
+}
+function pedDelGrp(btn) {
+  const grp = btn.closest('.ped-grp');
+  const name = grp.querySelector('.ped-grp-name').value.trim() || 'this group';
+  if (grp.querySelector('.pi-desc') && !confirm(`Delete group "${name}" and its items?`)) return;
+  grp.remove();
+}
+
+function gatherPresetTree() {
+  const areas = [];
+  document.querySelectorAll('#ped-list .ped-cat').forEach(cat => {
+    const area = cat.querySelector('.ped-cat-name').value.trim();
+    if (!area) return;
+    const subs = [];
+    cat.querySelectorAll('.ped-grp').forEach(grp => {
+      const gname = grp.querySelector('.ped-grp-name').value.trim() || 'Group';
+      const items = [];
+      grp.querySelectorAll('tbody tr').forEach(tr => {
+        const d = tr.querySelector('.pi-desc').value.trim();
+        if (!d) return;
+        items.push({
+          description: d,
+          uom: tr.querySelector('.pi-uom').value.trim(),
+          isPerFt: false,
+          qty: parseFloat(tr.querySelector('.pi-qty').value) || 0,
+          unit_price: parseFloat(tr.querySelector('.pi-price').value) || 0,
+        });
+      });
+      if (items.length) subs.push({ name: gname, sets: [{ name: gname, runFt: null, category: 'construction', items }] });
+    });
+    if (subs.length) areas.push({ area, targetRoom: area, subs });
+  });
+  return areas;
+}
+
+async function savePresetEditor() {
+  const tree = gatherPresetTree();
+  const res = await fetch('/presets', {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(tree),
+  });
+  if (res.ok) {
+    const r = await res.json();
+    toast(`Saved ${r.areas} categories · ${r.items} items ✓`);
+    loadPresetEditor();  // reflect normalized data (empty rows dropped)
+  } else {
+    toast(await errMsg(res, 'Save failed'), true);
+  }
+}
+
+// ---- Packages (grouped by property category) ----
+let _pkgAll = [];
+let _extraCats = [];        // session-only empty categories (persist once a package lands in them)
+let _pkgDragId = null;      // id of the package currently being dragged
+let _pkgDndInit = false;    // container drag listeners attached once
+
+async function loadPackages() {
+  try { _pkgAll = await fetch('/packages?kind=quote').then(r => r.json()); }
+  catch (e) { _pkgAll = []; }
+  renderPackages();
+}
+
+// Grand total of a package, matching the quote form: subtotal − discount + SST
+function pkgTotal(p) {
+  const d = p.data || {};
+  const sub = (d.sections || []).reduce((t, s) =>
+    t + (s.groups || []).reduce((gt, g) =>
+      gt + (g.items || []).reduce((it, i) => it + (i.qty || 0) * (i.unit_price || 0), 0), 0), 0);
+  let disc = 0;
+  const raw = (d.discount?.raw || '').trim();
+  if (d.discount?.waive) disc = sub;
+  else if (raw.endsWith('%')) { const pct = parseFloat(raw.slice(0, -1)); if (isFinite(pct) && pct > 0) disc = sub * pct / 100; }
+  else { const amt = parseFloat(raw); if (isFinite(amt) && amt > 0) disc = amt; }
+  disc = Math.min(disc, sub);
+  const net = sub - disc;
+  return net + net * (parseFloat(d.sst_rate) || 0);
+}
+function fmtMoney(n) { return (n || 0).toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+// Group packages by category the same way the UI renders them (used by render + reorder).
+function pkgGroupsAndCats() {
+  const order = ['Condominium', 'Landed'];   // preferred sort position when present
+  const groups = {};
+  _extraCats.forEach(c => { groups[c] = groups[c] || []; });
+  _pkgAll.forEach(p => { const c = p.category || 'Uncategorized'; (groups[c] = groups[c] || []).push(p); });
+  Object.values(groups).forEach(arr => arr.sort((a, b) =>
+    (a.sort_order || 0) - (b.sort_order || 0) || (a.name || '').localeCompare(b.name || '')));
+  const cats = Object.keys(groups).sort((a, b) => {
+    const ia = order.indexOf(a), ib = order.indexOf(b);
+    if (ia !== -1 || ib !== -1) return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+    return a.localeCompare(b);
+  });
+  return { groups, cats };
+}
+
+function renderPackages() {
+  const el = document.getElementById('pkg-list');
+  const q = (document.getElementById('pkg-search')?.value || '').trim().toLowerCase();
+
+  // Search view: flat filtered list, no category groups, no drag.
+  if (q) {
+    const list = _pkgAll.filter(p => ((p.name || '') + ' ' + (p.subtitle || '') + ' ' + (p.category || ''))
+      .toLowerCase().includes(q));
+    el.innerHTML = list.length
+      ? list.map(p => pkgRowHtml(p, false)).join('')
+      : '<div class="ped-empty" style="padding:16px 8px">No packages match “' + esc(q) + '”.</div>';
+    wirePkgRowButtons(el);
+    return;
+  }
+
+  const { groups, cats } = pkgGroupsAndCats();
+  el.innerHTML = cats.map(cat => {
+    const arr = groups[cat];
+    const catQ = cat === 'Uncategorized' ? '' : encodeURIComponent(cat);
+    const rows = arr.length
+      ? arr.map(p => pkgRowHtml(p, true)).join('')
+      : '<div class="ped-empty" style="padding:12px 8px">No packages in this category yet.</div>';
+    return `<div class="pkg-cat-group" data-cat="${esc(cat)}">
+      <div class="pkg-cat-title"><span class="pk-cat-edit" data-cat="${esc(cat)}" title="Click to rename this category">${esc(cat)}</span><span class="pk-count">${arr.length}</span>
+        <span style="flex:1"></span><a class="pkg-cat-new" href="/new-quote?package=new&cat=${catQ}">➕ New</a>
+      </div>
+      ${rows}
+    </div>`;
+  }).join('');
+
+  wirePkgRowButtons(el);
+  el.querySelectorAll('.pk-cat-edit').forEach(sp => sp.addEventListener('click', () => pkgStartRenameCat(sp)));
+  el.querySelectorAll('.pk-drag').forEach(wirePkgDragHandle);
+  wirePkgContainer();
+}
+
+function pkgRowHtml(p, draggable) {
+  const nItems = (p.data?.sections || []).reduce(
+    (n, s) => n + (s.groups || []).reduce((m, g) => m + (g.items?.length || 0), 0), 0);
+  const nSecs = (p.data?.sections || []).length;
+  const handle = draggable ? '<span class="pk-drag" draggable="true" title="Drag to reorder or move category">⋮⋮</span>' : '';
+  return `<div class="pkg-item" data-id="${p.id}">
+      ${handle}
+      <div>
+        <div class="pk-name"><span class="pk-name-edit" data-name="${p.id}" title="Click to rename">${esc(p.name)}</span> <span class="pk-price">RM ${fmtMoney(pkgTotal(p))}</span></div>
+        <div class="pk-meta">${p.subtitle ? esc(p.subtitle) + ' · ' : ''}${nSecs} sections · ${nItems} items</div>
+      </div>
+      <div class="grow"></div>
+      <a class="btn-sm" href="/new-quote?package=${p.id}">✏ Edit</a>
+      <button class="btn-sm" data-imp="${p.id}" title="Replace this package's contents from a .json file">⬆ Import</button>
+      <button class="btn-sm" data-dup="${p.id}">⧉ Duplicate</button>
+      <button class="btn-sm btn-del" data-del="${p.id}">🗑 Delete</button>
+    </div>`;
+}
+
+function wirePkgRowButtons(el) {
+  el.querySelectorAll('.btn-del').forEach(btn => btn.addEventListener('click', () => {
+    const p = _pkgAll.find(x => x.id == btn.dataset.del);
+    if (p) deletePackage(p.id, p.name);
+  }));
+  el.querySelectorAll('[data-dup]').forEach(btn => btn.addEventListener('click', () => {
+    const p = _pkgAll.find(x => x.id == btn.dataset.dup);
+    if (p) duplicatePackage(p);
+  }));
+  el.querySelectorAll('[data-imp]').forEach(btn => btn.addEventListener('click', () => {
+    const p = _pkgAll.find(x => x.id == btn.dataset.imp);
+    if (p) importPackage(p);
+  }));
+  el.querySelectorAll('.pk-name-edit').forEach(sp => sp.addEventListener('click', () => pkgStartRename(sp)));
+}
+
+// ---- Import a package's contents from a .json file (replaces sections/items) ----
+// Accepts either the raw quote data object ({sections:[...]}) or a wrapper
+// {subtitle?, data:{sections:[...]}}. Only `data` (and optional subtitle) are applied;
+// the package's name and category are left as-is.
+function importPackage(p) {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = '.json,application/json';
+  inp.addEventListener('change', async () => {
+    const file = inp.files[0];
+    if (!file) return;
+    let parsed;
+    try { parsed = JSON.parse(await file.text()); }
+    catch (e) { toast('Not valid JSON: ' + e.message, true); return; }
+    const data = parsed && parsed.sections ? parsed : (parsed && parsed.data);
+    if (!data || !Array.isArray(data.sections)) {
+      toast('JSON must contain a data object with a "sections" array', true); return;
+    }
+    const nItems = data.sections.reduce((n, s) => n + (s.groups || []).reduce((m, g) => m + (g.items || []).length, 0), 0);
+    if (!confirm(`Replace the contents of "${p.name}" with ${data.sections.length} section(s) / ${nItems} item(s) from "${file.name}"?\n\nThis overwrites the current items in this package.`)) return;
+    const body = { data };
+    if (parsed.subtitle != null) body.subtitle = parsed.subtitle;
+    const res = await fetch('/packages/' + p.id, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    });
+    if (res.ok) { toast('Imported into “' + p.name + '” ✓'); loadPackages(); }
+    else toast(await errMsg(res, 'Import failed'), true);
+  });
+  inp.click();
+}
+
+// ---- Inline rename ----
+function pkgStartRename(span) {
+  const id = +span.dataset.name;
+  const p = _pkgAll.find(x => x.id === id);
+  if (!p || span.parentElement.querySelector('.pk-name-inp')) return;
+  const inp = document.createElement('input');
+  inp.className = 'pk-name-inp';
+  inp.value = p.name;
+  span.replaceWith(inp);
+  inp.focus(); inp.select();
+  let done = false;
+  const commit = async (save) => {
+    if (done) return; done = true;
+    const nv = inp.value.trim();
+    if (save && nv && nv !== p.name) {
+      const res = await fetch('/packages/' + id, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: nv }),
+      });
+      if (res.ok) { p.name = nv; toast('Renamed ✓'); }
+      else { toast(await errMsg(res, 'Rename failed'), true); }
+    }
+    renderPackages();
+  };
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); commit(true); }
+    else if (e.key === 'Escape') { e.preventDefault(); commit(false); }
+  });
+  inp.addEventListener('blur', () => commit(true));
+}
+
+// ---- Rename a category (moves every package in it to the new name) ----
+function pkgStartRenameCat(span) {
+  const oldCat = span.dataset.cat;
+  if (span.parentElement.querySelector('.pk-cat-inp')) return;
+  const inp = document.createElement('input');
+  inp.className = 'pk-cat-inp';
+  inp.value = oldCat;
+  span.replaceWith(inp);
+  inp.focus(); inp.select();
+  let done = false;
+  const commit = (save) => {
+    if (done) return; done = true;
+    const nv = inp.value.trim();
+    if (save && nv && nv !== oldCat) {
+      _extraCats = [...new Set(_extraCats.map(c => (c === oldCat ? nv : c)))];
+      const newVal = (nv === 'Uncategorized') ? null : nv;
+      let moved = 0;
+      _pkgAll.forEach(p => { if ((p.category || 'Uncategorized') === oldCat) { p.category = newVal; moved++; } });
+      if (moved) { renumberAndPersist(); toast('Category renamed ✓'); return; }  // persists moves
+    }
+    renderPackages();  // no packages moved (empty session category) or cancelled
+  };
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); commit(true); }
+    else if (e.key === 'Escape') { e.preventDefault(); commit(false); }
+  });
+  inp.addEventListener('blur', () => commit(true));
+}
+
+// ---- New (session) category ----
+function pkgAddCategory() {
+  const name = (prompt('New category name (e.g. Bungalow, Semi-D, Commercial):') || '').trim();
+  if (!name) return;
+  const lc = name.toLowerCase();
+  const exists = _pkgAll.some(p => (p.category || 'Uncategorized').toLowerCase() === lc)
+    || _extraCats.some(c => c.toLowerCase() === lc)
+    || ['condominium', 'landed', 'uncategorized'].includes(lc);
+  if (!exists) _extraCats.push(name);
+  const s = document.getElementById('pkg-search'); if (s) s.value = '';
+  renderPackages();
+  toast('Category “' + name + '” added — drag a package in or click ➕ New');
+}
+
+// ---- Drag & drop (reorder + move between categories) ----
+function wirePkgDragHandle(handle) {
+  handle.addEventListener('dragstart', e => {
+    const item = handle.closest('.pkg-item');
+    _pkgDragId = +item.dataset.id;
+    item.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', String(_pkgDragId)); } catch (_) {}
+  });
+  handle.addEventListener('dragend', () => {
+    document.querySelectorAll('#pkg-list .pkg-item.dragging').forEach(el => el.classList.remove('dragging'));
+    clearPkgDropMarks();
+    _pkgDragId = null;
+  });
+}
+
+function clearPkgDropMarks() {
+  document.querySelectorAll('#pkg-list .drop-above,#pkg-list .drop-below,#pkg-list .drop-target')
+    .forEach(el => el.classList.remove('drop-above', 'drop-below', 'drop-target'));
+}
+
+function wirePkgContainer() {
+  if (_pkgDndInit) return;
+  _pkgDndInit = true;
+  const el = document.getElementById('pkg-list');
+  el.addEventListener('dragover', e => {
+    if (_pkgDragId == null) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    clearPkgDropMarks();
+    const overItem = e.target.closest('.pkg-item');
+    if (overItem && +overItem.dataset.id !== _pkgDragId) {
+      const r = overItem.getBoundingClientRect();
+      overItem.classList.add((e.clientY < r.top + r.height / 2) ? 'drop-above' : 'drop-below');
+    } else {
+      const grp = e.target.closest('.pkg-cat-group');
+      if (grp) grp.classList.add('drop-target');
+    }
+  });
+  el.addEventListener('dragleave', e => { if (!el.contains(e.relatedTarget)) clearPkgDropMarks(); });
+  el.addEventListener('drop', e => {
+    if (_pkgDragId == null) return;
+    e.preventDefault();
+    const dragged = _pkgAll.find(p => p.id === _pkgDragId);
+    clearPkgDropMarks();
+    if (!dragged) return;
+    const overItem = e.target.closest('.pkg-item');
+    const grp = e.target.closest('.pkg-cat-group');
+    let targetCat = grp ? grp.dataset.cat : (dragged.category || 'Uncategorized');
+    let overId = null, before = true;
+    if (overItem && +overItem.dataset.id !== _pkgDragId) {
+      overId = +overItem.dataset.id;
+      const r = overItem.getBoundingClientRect();
+      before = e.clientY < r.top + r.height / 2;
+      const oi = _pkgAll.find(p => p.id === overId);
+      if (oi) targetCat = oi.category || 'Uncategorized';
+    }
+    pkgPlace(dragged, targetCat, overId, before);
+  });
+}
+
+// Re-file + reposition the dragged package, then renumber everything and persist.
+function pkgPlace(dragged, targetCat, overId, before) {
+  dragged.category = (targetCat === 'Uncategorized') ? null : targetCat;
+  const members = _pkgAll
+    .filter(p => (p.category || 'Uncategorized') === targetCat && p.id !== dragged.id)
+    .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0) || (a.name || '').localeCompare(b.name || ''));
+  let idx = members.length;
+  if (overId != null) {
+    const pos = members.findIndex(m => m.id === overId);
+    if (pos >= 0) idx = before ? pos : pos + 1;
+  }
+  const prev = members[idx - 1], next = members[idx];
+  const lo = prev ? (prev.sort_order || 0) : ((next ? (next.sort_order || 0) : 0) - 1);
+  const hi = next ? (next.sort_order || 0) : ((prev ? (prev.sort_order || 0) : 0) + 1);
+  dragged.sort_order = (lo + hi) / 2;   // fractional slot; renumber below normalises to ints
+  renumberAndPersist();
+}
+
+async function renumberAndPersist() {
+  const { groups, cats } = pkgGroupsAndCats();
+  let n = 1;
+  const payload = [];
+  cats.forEach(cat => groups[cat].forEach(p => {
+    p.sort_order = n++;
+    payload.push({ id: p.id, category: p.category || null, sort_order: p.sort_order });
+  }));
+  renderPackages();
+  try {
+    const res = await fetch('/packages/reorder', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) toast(await errMsg(res, 'Could not save order'), true);
+  } catch (e) { toast('Could not save order', true); }
+}
+
+// Build a copy name unique within the same category ("X (copy)", "X (copy 2)"…)
+function _copyName(base, category) {
+  const cat = category || null;
+  const taken = new Set(_pkgAll
+    .filter(p => (p.category || null) === cat)
+    .map(p => (p.name || '').toLowerCase()));
+  let name = `${base} (copy)`;
+  let n = 2;
+  while (taken.has(name.toLowerCase())) { name = `${base} (copy ${n})`; n++; }
+  return name;
+}
+
+async function duplicatePackage(p) {
+  const name = _copyName(p.name, p.category);
+  const res = await fetch('/packages', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name, kind: 'quote', category: p.category || null,
+      subtitle: p.subtitle || null, data: p.data || {},
+    }),
+  });
+  if (res.ok) { toast('Duplicated as “' + name + '” ✓'); loadPackages(); }
+  else toast(await errMsg(res, 'Duplicate failed'), true);
+}
+
+async function deletePackage(id, name) {
+  if (!confirm(`Delete package "${name}"? This cannot be undone.`)) return;
+  const res = await fetch('/packages/' + id, { method: 'DELETE' });
+  if (res.ok || res.status === 204) { toast('Package deleted ✓'); loadPackages(); }
+  else toast(await errMsg(res, 'Delete failed'), true);
+}
+
+async function uploadPresets() {
+  const inp = document.getElementById('f-upload');
+  const file = inp.files[0];
+  if (!file) return;
+  if (!confirm(`Upload "${file.name}" and REPLACE the entire preset library?`)) { inp.value = ''; return; }
+  const fd = new FormData();
+  fd.append('file', file);
+  const res = await fetch('/presets/import-xlsx', { method: 'POST', body: fd });
+  if (res.ok) {
+    const r = await res.json();
+    toast(`Loaded ${r.areas} areas, ${r.sets} sets, ${r.items} items ✓`);
+    loadPresetEditor();
+  } else {
+    toast(await errMsg(res, 'Upload failed'), true);
+  }
+  inp.value = '';
+}
+
+// ---- Helpers ----
+async function errMsg(res, fallback) {
+  try { const e = await res.json(); return e.detail || fallback; } catch (e) { return fallback; }
+}
+function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function toast(msg, err = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast' + (err ? ' error' : ''); t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3200);
+}
+
+// ---- Product autocomplete for preset item descriptions ----
+let PI_AC_INPUT = null, PI_AC_POOL = [], PI_AC_HI = -1;
+function piAcEl() {
+  let d = document.getElementById('pi-ac');
+  if (!d) { d = document.createElement('div'); d.id = 'pi-ac'; d.className = 'pi-ac'; document.body.appendChild(d); }
+  return d;
+}
+function piAcSearch(q) {
+  const tokens = q.split(/\s+/).filter(Boolean);
+  return (PRODUCTS || []).filter(p => p.is_active !== false).map(m => {
+    const desc = (m.description || '').toLowerCase();
+    const hay = ((m.type || '') + ' ' + (m.description || '') + ' ' + (m.uom || '')).toLowerCase();
+    if (!tokens.every(t => hay.includes(t))) return null;
+    let s = 0;
+    if (desc.includes(q)) s += 100;
+    if (desc.startsWith(tokens[0])) s += 20;
+    s += tokens.reduce((a, t) => desc.includes(t) ? a + 5 : a, 0);
+    return { m, s };
+  }).filter(Boolean)
+    .sort((a, b) => b.s - a.s || (a.m.description || '').length - (b.m.description || '').length)
+    .slice(0, 12).map(x => x.m);
+}
+function piAcShow(input) {
+  const q = input.value.trim().toLowerCase();
+  const d = piAcEl();
+  if (q.length < 1 || !(PRODUCTS && PRODUCTS.length)) { d.style.display = 'none'; return; }
+  PI_AC_POOL = piAcSearch(q); PI_AC_HI = -1;
+  if (!PI_AC_POOL.length) { d.style.display = 'none'; return; }
+  const r = input.getBoundingClientRect();
+  d.style.left = (r.left + window.scrollX) + 'px';
+  d.style.top  = (r.bottom + window.scrollY + 2) + 'px';
+  d.style.width = Math.max(r.width, 280) + 'px';
+  d.innerHTML = PI_AC_POOL.map((m, i) =>
+    `<div class="pi-ac-item" data-i="${i}"><span class="d">${esc(m.description)}</span><span class="t">${esc(m.type)} · ${esc(m.uom || '')}</span><span class="p">RM ${m.price}</span></div>`).join('');
+  d.style.display = 'block';
+  PI_AC_INPUT = input;
+  d.querySelectorAll('.pi-ac-item').forEach(el =>
+    el.addEventListener('mousedown', e => { e.preventDefault(); piAcPick(PI_AC_POOL[+el.dataset.i]); }));
+}
+function piAcPick(m) {
+  if (!PI_AC_INPUT || !m) return;
+  PI_AC_INPUT.value = m.description;
+  const tr = PI_AC_INPUT.closest('tr');
+  if (tr) {
+    const u = tr.querySelector('.pi-uom'); if (u && !u.value) u.value = m.uom || '';
+    const pr = tr.querySelector('.pi-price'); if (pr) pr.value = m.price || 0;
+  }
+  pedSyncDetail(PI_AC_INPUT);
+  piAcEl().style.display = 'none';
+}
+document.addEventListener('input', e => {
+  if (e.target.classList && e.target.classList.contains('pi-desc')) { piAcShow(e.target); pedSyncDetail(e.target); }
+});
+document.addEventListener('keydown', e => {
+  if (!(e.target.classList && e.target.classList.contains('pi-desc'))) return;
+  const d = piAcEl(); const items = d.querySelectorAll('.pi-ac-item');
+  if (d.style.display === 'none' || !items.length) return;
+  if (e.key === 'ArrowDown') { e.preventDefault(); PI_AC_HI = Math.min(PI_AC_HI + 1, items.length - 1); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); PI_AC_HI = Math.max(PI_AC_HI - 1, 0); }
+  else if (e.key === 'Enter' && PI_AC_HI >= 0) { e.preventDefault(); piAcPick(PI_AC_POOL[PI_AC_HI]); return; }
+  else if (e.key === 'Escape') { d.style.display = 'none'; return; }
+  items.forEach((el, i) => el.classList.toggle('hi', i === PI_AC_HI));
+});
+document.addEventListener('focusout', e => {
+  if (e.target.classList && e.target.classList.contains('pi-desc'))
+    setTimeout(() => { const d = document.getElementById('pi-ac'); if (d) d.style.display = 'none'; }, 150);
+});
+
+if (location.hash === '#presets') showTab('presets');
+else if (location.hash === '#packages') showTab('packages');
+loadProducts();
+loadPresetEditor();
+loadPackages();
+</script>
+</body>
+</html>

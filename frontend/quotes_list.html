@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Melvin Gan Carpentry — Quotations</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@200&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f6fa; color: #1a1a2e; }
+  nav { background: #f0ebe1; padding: 16px 32px; display: flex; align-items: center; gap: 24px; }
+  .nav-logo { font-family: 'Raleway', sans-serif; font-weight: 200; font-size: 19px; letter-spacing: 4px; color: #1a1a2e; white-space: nowrap; flex-shrink: 0; text-decoration: none; }
+  nav a { color: #7a6352; text-decoration: none; font-size: 14px; }
+  nav a:hover, nav a.active { color: #1a1a2e; }
+  nav .spacer { flex: 1; }
+  nav button.logout { background: none; border: 1px solid #c9b9a5; color: #7a6352; padding: 4px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+  .main { padding: 32px; max-width: 960px; margin: 0 auto; }
+  .top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+  .top-row h2 { font-size: 22px; font-weight: 800; }
+  .search-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+  .search-bar input { padding: 9px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; width: 280px; }
+  .search-bar input:focus { outline: none; border-color: #8a7364; }
+  .result-count { font-size: 12px; color: #aaa; }
+  button.primary { background: #4a3b30; color: white; border: none; padding: 9px 18px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
+  button.primary:hover { background: #33291f; }
+  .card { background: white; border-radius: 12px; padding: 0; box-shadow: 0 1px 4px rgba(0,0,0,.06); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { background: #1a1a2e; color: white; padding: 11px 16px; text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+  th.r, td.r { text-align: right; }
+  td { padding: 11px 16px; border-bottom: 1px solid #f0f0f5; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafafe; }
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .badge-draft{background:#f3f4f6;color:#374151}
+  .badge-sent{background:#dbeafe;color:#1d4ed8}
+  .badge-negotiating{background:#ffedd5;color:#c2410c}
+  .badge-accepted{background:#d1fae5;color:#065f46}
+  .badge-rejected{background:#fee2e2;color:#991b1b}
+  .pay-unpaid{background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+  .pay-partial{background:#fef3c7;color:#b45309;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+  .pay-paid{background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+  .empty { padding: 48px; text-align: center; color: #aaa; font-size: 14px; }
+  a.qt-link { color: #4a3b30; font-weight: 700; text-decoration: none; }
+  a.qt-link:hover { text-decoration: underline; }
+
+  @media(max-width:640px){
+    nav { padding: 8px 14px; gap: 8px; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+    nav::-webkit-scrollbar { display: none; }
+    .nav-logo { font-size: 15px; letter-spacing: 3px; }
+    nav a { font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+    nav .spacer { display: none; }
+    nav button.logout { white-space: nowrap; flex-shrink: 0; font-size: 11px; padding: 4px 8px; }
+    .main { padding: 12px; }
+    .top-row h2 { font-size: 18px; }
+    .top-row button { font-size: 12px; padding: 8px 12px; }
+    .search-bar input { width: 100%; }
+    /* Table scrolls horizontally — 7 columns can't fit on mobile */
+    .card { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { min-width: 580px; }
+    td, thead th { padding: 9px 10px; }
+  }
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">melvin gan carpentry</a>
+  <a href="/">Dashboard</a>
+  <a href="/leads-page">All Leads</a>
+  <a href="/quotes-page" class="active">Quotations</a>
+  <a href="/checklists-page">Checklists</a>
+  <a href="/admin/presets">Library</a>
+  <div class="spacer"></div>
+  <form method="POST" action="/logout" style="margin:0"><button class="logout" type="submit">Sign out</button></form>
+</nav>
+
+<div class="main">
+  <div class="top-row">
+    <h2>All Quotations</h2>
+    <button class="primary viewer-hide" onclick="window.location.href='/new-quote'">+ New Quotation</button>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" id="search-input" placeholder="Search client name, phone, or quote no…" oninput="renderTable()">
+    <span class="result-count" id="result-count"></span>
+  </div>
+
+  <div class="card">
+    <div id="table-wrap">
+      <div class="empty">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+let allQuotes = [];
+
+async function load() {
+  allQuotes = await fetch('/quotes').then(r => r.json());
+  renderTable();
+}
+
+function renderTable() {
+  const q = (document.getElementById('search-input').value || '').trim().toLowerCase();
+  const filtered = q ? allQuotes.filter(qt =>
+    (qt.client_name   || '').toLowerCase().includes(q) ||
+    (qt.client_phone  || '').toLowerCase().includes(q) ||
+    (qt.quote_number  || '').toLowerCase().includes(q) ||
+    (qt.project_address || '').toLowerCase().includes(q)
+  ) : allQuotes;
+
+  const wrap = document.getElementById('table-wrap');
+  document.getElementById('result-count').textContent =
+    q ? `${filtered.length} of ${allQuotes.length} results` : `${allQuotes.length} total`;
+
+  if (!filtered.length) {
+    wrap.innerHTML = q
+      ? '<div class="empty">No matching quotations.</div>'
+      : '<div class="empty">No quotations yet. Create one from a lead.</div>';
+    return;
+  }
+
+  wrap.innerHTML = `<table>
+    <thead><tr>
+      <th>Quote No.</th><th>Client</th><th>Project Type</th>
+      <th class="r">Total (RM)</th><th>Status</th><th>Proforma Invoice</th><th>Created</th>
+    </tr></thead>
+    <tbody>${filtered.map(qt => `
+      <tr>
+        <td><a class="qt-link" href="/quote/${qt.id}">${esc(qt.quote_number)}</a>${qt.is_locked ? ' <span style="font-size:10px;color:#888">🔒</span>' : ''}</td>
+        <td>${esc(qt.client_name)}</td>
+        <td style="color:#555">${qt.project_type ? qt.project_type.charAt(0).toUpperCase()+qt.project_type.slice(1) : '—'}</td>
+        <td class="r" style="font-weight:700">${fmt(qt.total)}</td>
+        <td><span class="badge badge-${qt.status}">${qt.status}</span></td>
+        <td>${qt.is_locked ? '<span class="pay-unpaid">Proforma</span>' : '—'}</td>
+        <td style="color:#aaa;font-size:12px">${fmtDate(qt.created_at)}</td>
+      </tr>`).join('')}
+    </tbody>
+  </table>`;
+}
+
+function fmt(n) { return Number(n||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,","); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtDate(s) {
+  if (!s) return '—';
+  return new Date(s).toLocaleString('en-MY', {day:'numeric',month:'short',year:'numeric'});
+}
+
+load();
+</script>
+<script>
+(async()=>{
+  try{
+    const me=await fetch('/me').then(r=>r.json());
+    window.__viewer=me.role==='viewer';
+    if(window.__viewer){
+      document.querySelectorAll('.viewer-hide').forEach(el=>el.style.display='none');
+      const sp=document.querySelector('nav .spacer');
+      if(sp){const b=document.createElement('span');b.textContent='View Only';b.style.cssText='background:#fef3c7;color:#b45309;font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;white-space:nowrap';sp.after(b);}
+    }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>

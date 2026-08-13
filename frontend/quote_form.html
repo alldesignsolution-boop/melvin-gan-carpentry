@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Melvin Gan Carpentry — New Quotation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@200&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f6fa; color: #1a1a2e; }
+  nav { background: #f0ebe1; padding: 16px 32px; display: flex; align-items: center; gap: 24px; }
+  .nav-logo { font-family: 'Raleway', sans-serif; font-weight: 200; font-size: 19px; letter-spacing: 4px; color: #1a1a2e; white-space: nowrap; flex-shrink: 0; text-decoration: none; }
+  nav a { color: #7a6352; text-decoration: none; font-size: 14px; }
+  nav a:hover { color: #1a1a2e; }
+  nav .spacer { flex: 1; }
+  nav button.logout { background: none; border: 1px solid #c9b9a5; color: #7a6352; padding: 4px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+
+  .main { padding: 28px 32px; max-width: 1020px; margin: 0 auto; }
+  .page-title { font-size: 22px; font-weight: 800; margin-bottom: 20px; }
+
+  .card { background: white; border-radius: 12px; padding: 22px 24px; box-shadow: 0 1px 4px rgba(0,0,0,.06); margin-bottom: 14px; }
+  .card-title { font-size: 11px; font-weight: 700; color: #4a3b30; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 14px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .form-grid.g3 { grid-template-columns: 1fr 1fr 1fr; }
+  .fg { display: flex; flex-direction: column; gap: 4px; }
+  .fg label { font-size: 11px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+  .fg input, .fg select, .fg textarea { padding: 9px 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; font-family: inherit; }
+  .fg textarea { min-height: 70px; resize: vertical; }
+  #f-terms { font-size: 11px; line-height: 1.6; min-height: 160px; }
+  .fg input:focus, .fg select:focus { outline: none; border-color: #8a7364; }
+
+  /* Section blocks */
+  .sec-block { background: #faf7f2; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.06); margin-bottom: 10px; }
+  .sec-head { display: flex; align-items: center; padding: 13px 20px; user-select: none; border-radius: 12px; gap: 8px; }
+  .sec-move-btns { display: flex; gap: 2px; flex-shrink: 0; }
+  .btn-move-sec { background: none; border: 1px solid rgba(122,99,82,.25); color: #6b5544; font-size: 12px; cursor: pointer; padding: 1px 6px; border-radius: 4px; line-height: 1.4; }
+  .btn-move-sec:hover { background: rgba(122,99,82,.1); border-color: #6b5544; }
+  .sec-head:hover { background: #fafafe; }
+  .sec-head .sec-name { font-size: 14px; font-weight: 700; flex: 1; }
+  .sec-name-inp { font-size: 14px; font-weight: 700; flex: 1; border: none; background: transparent; color: inherit; padding: 2px 6px; border-radius: 5px; cursor: text; min-width: 80px; max-width: 260px; }
+  .sec-name-inp:hover { background: rgba(255,255,255,.15); }
+  .sec-name-inp:focus { outline: 2px solid rgba(255,255,255,.5); background: rgba(255,255,255,.15); }
+  .sec-head .sec-total { font-size: 13px; font-weight: 700; color: #4a3b30; margin-right: 10px; }
+  .sec-head .chevron { font-size: 11px; color: #bbb; transition: transform .2s; }
+  .sec-head.open .chevron { transform: rotate(180deg); }
+  .sec-body { padding: 0 20px 18px; display: none; border-top: 1px solid #f3f4f6; background: white; border-radius: 0 0 12px 12px; }
+  .sec-body.open { display: block; }
+
+  /* Items table */
+  .items-tbl { width: 100%; border-collapse: collapse; margin-top: 12px; margin-bottom: 10px; }
+  .items-tbl th { font-size: 10px; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: .5px; padding: 6px 8px; border-bottom: 1.5px solid #f0f0f5; text-align: left; }
+  .items-tbl th.r { text-align: right; }
+  .items-tbl td { padding: 3px 3px; vertical-align: top; }
+  .items-tbl .col-desc  { width: 70%; }
+  .items-tbl .col-uom   { width: 5%; }
+  .items-tbl .col-qty   { width: 6%; }
+  .items-tbl .col-price { width: 9%; }
+  .items-tbl .col-amt   { width: 8%; text-align: right; padding-right: 6px; }
+  .items-tbl td.col-amt { font-size: 13px; font-weight: 600; color: #374151; padding-top: 10px; }
+  .items-tbl .col-del   { width: 2%; text-align: center; }
+  .items-tbl .col-drag  { width: 22px; text-align: center; cursor: grab; color: #d0d0d5; font-size: 14px; user-select: none; padding-top: 10px; }
+  .items-tbl .col-drag:hover { color: #6b5544; }
+  .items-tbl tr.dragging { opacity: 0.35; }
+  .items-tbl tr.drop-above td { border-top: 2px solid #6b5544 !important; }
+  .items-tbl tr.drop-below td { border-bottom: 2px solid #6b5544 !important; }
+  .items-tbl tbody.drop-empty { background: linear-gradient(180deg,#faf7f2,transparent) !important; }
+  .sec-block.dragging { opacity: 0.35; }
+  .sec-block.drop-above { border-top: 3px solid #6b5544; margin-top: -3px; }
+  .sec-block.drop-below { border-bottom: 3px solid #6b5544; margin-bottom: -3px; }
+  .sec-drag-handle { cursor: grab; color: #8a7364; font-size: 14px; padding: 4px 6px; user-select: none; }
+  .sec-drag-handle:hover { color: #4a3b30; }
+  .items-tbl input { padding: 7px 9px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 13px; width: 100%; font-family: inherit; background: white; }
+  .items-tbl input:focus { outline: none; border-color: #8a7364; background: #fdfbf7; }
+  /* Hide the up/down spinner arrows on Qty & Unit Price number inputs */
+  .items-tbl input[type=number]::-webkit-outer-spin-button,
+  .items-tbl input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .items-tbl input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+  .items-tbl textarea.details-inp { display: block; width: 100%; margin-top: 4px; padding: 6px 9px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 12px; color: #6b5544; font-style: italic; font-family: inherit; background: white; resize: none; overflow: hidden; line-height: 1.4; box-sizing: border-box; }
+  .items-tbl textarea.details-inp:focus { outline: none; border-color: #8a7364; background: #fdfbf7; }
+  .items-tbl tr:hover td { background: #fafafe; }
+
+  /* Autocomplete */
+  .ac-wrap { position: relative; }
+  .ac-drop { position: absolute; top: calc(100% + 2px); left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 8px 28px rgba(0,0,0,.13); z-index: 999; max-height: 230px; overflow-y: auto; display: none; }
+  .ac-item { padding: 8px 12px; cursor: pointer; display: flex; align-items: baseline; gap: 8px; border-bottom: 1px solid #f8f8f8; }
+  .ac-item:last-child { border-bottom: none; }
+  .ac-item:hover, .ac-item.hi { background: #f0ebe1; }
+  .ac-desc  { flex: 1; font-size: 12px; color: #111; }
+  .ac-tag   { font-size: 10px; color: #aaa; white-space: nowrap; }
+  .ac-price { font-size: 12px; font-weight: 700; color: #4a3b30; white-space: nowrap; }
+
+  /* Row delete */
+  .btn-del { background: none; border: none; color: #ddd; font-size: 17px; cursor: pointer; padding: 2px 6px; border-radius: 4px; line-height: 1; }
+  .btn-del:hover { color: #ef4444; background: #fff0f0; }
+
+  /* Add item */
+  .btn-add-item { background: none; border: 1.5px dashed #d3c3ae; color: #6b5544; padding: 6px 14px; border-radius: 7px; font-size: 12px; cursor: pointer; font-weight: 600; margin-top: 4px; }
+  .btn-add-item:hover { background: #faf7f2; }
+  .btn-add-item.alt { border-color: #d3c3ae; background: #faf7f2; }
+
+  /* Groups within a section */
+  .grp-block { margin-top: 10px; border: 1px solid #efe9fb; border-radius: 10px; padding: 8px 12px 12px; background: #fcfbff; }
+  .grp-block.base { margin-top: 4px; border: none; background: transparent; padding: 0; }
+  .grp-head { display: flex; align-items: center; gap: 8px; padding: 2px 0 4px; }
+  .grp-drag { cursor: grab; color: #d3c3ae; font-size: 13px; user-select: none; padding: 2px 2px; }
+  .grp-drag:hover { color: #4a3b30; }
+  .grp-name-inp { font-size: 12.5px; font-weight: 700; color: #4a3b30; flex: 1; border: 1px solid transparent; background: transparent; padding: 3px 7px; border-radius: 6px; min-width: 60px; max-width: 260px; }
+  .grp-name-inp:hover { background: #f3eefe; }
+  .grp-name-inp:focus { outline: none; border-color: #d3c3ae; background: white; }
+  .grp-total { font-size: 12px; font-weight: 700; color: #6b5544; white-space: nowrap; }
+  .btn-grp-del { background: none; border: none; cursor: pointer; font-size: 13px; padding: 2px 6px; border-radius: 5px; line-height: 1; color: #d9b4b4; }
+  .btn-grp-del:hover { color: #ef4444; background: #fff0f0; }
+  .grp-block.dragging { opacity: 0.35; }
+  .grp-block.drop-above { border-top: 2.5px solid #6b5544; }
+  .grp-block.drop-below { border-bottom: 2.5px solid #6b5544; }
+  .grp-list.drop-empty-grp { outline: 2px dashed #d3c3ae; outline-offset: 3px; border-radius: 10px; }
+  .sec-foot { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .btn-add-group { background: #f3eefe; border: 1px solid #ddd0fa; color: #4a3b30; padding: 6px 14px; border-radius: 7px; font-size: 12px; cursor: pointer; font-weight: 700; }
+  .btn-add-group:hover { background: #e9e0fd; }
+  .btn-add-group.ghost { background: none; }
+
+  /* Package bar */
+  .pkg-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+  .btn-pkg { background: white; border: 1.5px solid #ddd0fa; color: #4a3b30; padding: 9px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 700; }
+  .btn-pkg:hover { background: #faf7f2; }
+  .btn-pkg.solid { background: #4a3b30; color: white; border-color: #4a3b30; }
+  .btn-pkg.solid:hover { background: #33291f; }
+  .pkg-menu { position: absolute; background: white; border: 1px solid #e5e7eb; border-radius: 10px; box-shadow: 0 8px 28px rgba(0,0,0,.14); min-width: 300px; max-width: 380px; z-index: 850; padding: 6px; max-height: 70vh; overflow-y: auto; }
+  .pkg-menu .pkg-empty { padding: 14px 16px; font-size: 12.5px; color: #999; text-align: center; }
+  .pkg-row { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 7px; cursor: pointer; }
+  .pkg-row:hover { background: #faf7f2; }
+  .pkg-row .pkg-name { flex: 1; font-size: 13px; color: #1a1a2e; font-weight: 600; }
+  .pkg-row .pkg-meta { font-size: 11px; color: #8a7364; white-space: nowrap; }
+  .pkg-row .pkg-del { background: none; border: none; color: #d9b4b4; font-size: 15px; cursor: pointer; padding: 2px 6px; border-radius: 5px; line-height: 1; }
+  .pkg-row .pkg-del:hover { color: #ef4444; background: #fff0f0; }
+  .pkg-menu-title { padding: 8px 12px 6px; font-size: 10.5px; font-weight: 700; color: #4a3b30; text-transform: uppercase; letter-spacing: .5px; }
+
+  /* Room management */
+  .btn-rm-room { background: none; border: none; color: #ccc; font-size: 11px; cursor: pointer; padding: 3px 8px; border-radius: 5px; margin-right: 6px; }
+  .btn-rm-room:hover { color: #ef4444; background: #fff0f0; }
+  .add-room-row { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; }
+  .room-inp { padding: 9px 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; flex: 1; max-width: 260px; font-family: inherit; }
+  .room-inp:focus { outline: none; border-color: #8a7364; }
+  .btn-add-room { background: none; border: 1.5px dashed #4a3b30; color: #4a3b30; padding: 9px 18px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
+  .btn-add-room:hover { background: #faf7f2; }
+
+  /* Totals */
+  .totals-wrap { display: flex; justify-content: flex-end; }
+  .totals-tbl { min-width: 300px; }
+  .totals-tbl td { padding: 6px 14px; font-size: 13px; }
+  .totals-tbl td:last-child { text-align: right; font-weight: 700; }
+  .totals-tbl tr.grand td { background: #1a1a2e; color: white; font-size: 15px; }
+  .totals-tbl tr.grand td:first-child { border-radius: 8px 0 0 8px; padding: 10px 14px; }
+  .totals-tbl tr.grand td:last-child  { border-radius: 0 8px 8px 0; padding: 10px 14px; }
+
+  .actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 6px; }
+  button.primary   { background: #4a3b30; color: white; border: none; padding: 11px 26px; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 700; }
+  button.primary:hover { background: #33291f; }
+  button.secondary { background: white; color: #555; border: 1px solid #e5e7eb; padding: 11px 22px; border-radius: 8px; font-size: 14px; cursor: pointer; }
+  button.secondary:hover { background: #f9fafb; }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #10b981; color: white; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; display: none; z-index: 500; }
+  .toast.error { background: #ef4444; }
+  @media(max-width:700px){ .form-grid,.form-grid.g3{ grid-template-columns:1fr } }
+
+  @media(max-width:640px){
+    nav { padding: 8px 14px; gap: 8px; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+    nav::-webkit-scrollbar { display: none; }
+    .nav-logo { font-size: 15px; letter-spacing: 3px; }
+    nav a { font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+    nav .spacer { display: none; }
+    nav button.logout { white-space: nowrap; flex-shrink: 0; font-size: 11px; padding: 4px 8px; }
+    .main { padding: 12px; }
+    .card { padding: 14px 12px; }
+    .page-title { font-size: 18px; margin-bottom: 14px; }
+    .sec-head { padding: 11px 12px; }
+    .sec-body { padding: 0 8px 12px; }
+    /* Hide UOM column on mobile so table fits without horizontal scroll */
+    .items-tbl th.col-uom, .items-tbl td.col-uom { display: none; }
+    .items-tbl .col-desc  { width: 50%; }
+    .items-tbl .col-qty   { width: 13%; }
+    .items-tbl .col-price { width: 19%; }
+    .items-tbl .col-amt   { width: 14%; }
+    .items-tbl input { padding: 6px 5px; font-size: 12px; }
+    .add-room-row { flex-wrap: wrap; }
+    .room-inp { max-width: 100%; }
+    .totals-tbl { width: 100%; }
+    .totals-wrap { justify-content: stretch; }
+    .actions { flex-direction: column-reverse; gap: 8px; }
+    .actions button { width: 100%; }
+    .sec-name-inp { max-width: 160px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">melvin gan carpentry</a>
+  <a href="/">Dashboard</a>
+  <a href="/leads-page">All Leads</a>
+  <a href="/quotes-page">Quotations</a>
+  <a href="/checklists-page">Checklists</a>
+  <a href="/admin/presets">Library</a>
+  <div class="spacer"></div>
+  <form method="POST" action="/logout" style="margin:0"><button class="logout" type="submit">Sign out</button></form>
+</nav>
+
+<div class="main">
+  <div class="page-title">New Quotation</div>
+
+  <!-- Client & Project -->
+  <div class="card">
+    <div class="card-title">Client & Project</div>
+    <div class="form-grid">
+      <div class="fg"><label>Client Name *</label><input id="f-client" type="text" placeholder="e.g. Tan Ah Kow"></div>
+      <div class="fg"><label>Phone / WhatsApp</label><input id="f-phone" type="text" placeholder="+60 12-xxx xxxx"></div>
+    </div>
+    <div class="form-grid">
+      <div class="fg"><label>Project Address</label><input id="f-address" type="text" placeholder="Unit, Block, Taman…"></div>
+      <div class="fg"><label>Project Type</label>
+        <select id="f-ptype">
+          <option value="">— None —</option>
+          <option value="residential">Residential</option>
+          <option value="commercial">Commercial</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-grid g3">
+      <div class="fg"><label>Size</label>
+        <select id="f-size">
+          <option value="">— Select —</option>
+          <option value="Below 900 sqft">Below 900 sqft</option>
+          <option value="901 to 1400 sqft">901 to 1400 sqft</option>
+          <option value="1401 to 2000 sqft">1401 to 2000 sqft</option>
+          <option value="Above 2001 sqft">Above 2001 sqft</option>
+        </select>
+      </div>
+      <div class="fg"><label>Design Theme</label><input id="f-theme" type="text" placeholder="e.g. Modern Minimalist"></div>
+      <div class="fg"><label>Condo Name</label><input id="f-condo" type="text" placeholder="e.g. Pavilion Residences"></div>
+    </div>
+    <div class="form-grid g3">
+      <div class="fg"><label>Valid Until</label><input id="f-valid" type="date"></div>
+      <div class="fg"><label>SST Rate</label>
+        <select id="f-sst">
+          <option value="0" selected>0% (No SST)</option>
+          <option value="0.06">6%</option>
+          <option value="0.08">8%</option>
+        </select>
+      </div>
+      <div></div>
+    </div>
+  </div>
+
+  <!-- Preset packages -->
+  <div class="pkg-bar">
+    <button class="btn-pkg" onclick="openPackagesMenu(event)">📦 Load Package ▾</button>
+    <button class="btn-pkg solid viewer-hide" onclick="saveAsPackage()">💾 Save as Package</button>
+  </div>
+
+  <div id="sections-wrap">
+
+  <!-- Design Fee -->
+  <div class="sec-block" id="block-design">
+    <div class="sec-head open" id="head-design">
+      <input class="sec-name-inp" id="secname-design" value="Design Fee"
+             onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter')this.blur()" title="Click to rename">
+      <span class="sec-total" id="design-total">RM 0.00</span>
+      <button class="btn-rm-room" onclick="removeRoom(event,'design')" title="Remove section">✕ Remove</button>
+      <div class="sec-move-btns">
+        <button class="btn-move-sec" onclick="moveSection(event,'up','design')" title="Move up">↑</button>
+        <button class="btn-move-sec" onclick="moveSection(event,'down','design')" title="Move down">↓</button>
+      </div>
+      <span class="chevron" onclick="toggleSec('design')" style="cursor:pointer;padding:0 4px">▼</span>
+      <span class="sec-drag-handle" title="Drag to reorder section">⋮⋮</span>
+    </div>
+    <div class="sec-body open" id="design-body-wrap">
+      <div class="grp-list" id="design-grps">
+        <div class="grp-block base" data-group="">
+          <table class="items-tbl">
+            <thead><tr>
+              <th class="col-drag"></th>
+              <th class="col-desc">Description</th><th class="col-uom">UOM</th>
+              <th class="col-qty r">Qty</th><th class="col-price r">Unit Price (RM)</th>
+              <th class="col-amt r">Amount (RM)</th><th class="col-del"></th>
+            </tr></thead>
+            <tbody id="design-tbody" class="grp-tbody"></tbody>
+          </table>
+          <div class="grp-actions" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+            <button class="btn-add-item" onclick="addItem('design')">+ Add Item</button>
+            <button class="btn-add-item alt" onclick="openPresetMenu(event,'design')">🎁 Insert Preset ▾</button>
+          </div>
+        </div>
+      </div>
+      <div class="sec-foot">
+        <button class="btn-add-group" onclick="addGroup('design')">➕ Add Group</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Room sections inserted here by renderRoom() (before misc) -->
+
+  <!-- Miscellaneous -->
+  <div class="sec-block" id="block-misc">
+    <div class="sec-head open" id="head-misc">
+      <input class="sec-name-inp" id="secname-misc" value="Miscellaneous"
+             onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter')this.blur()" title="Click to rename">
+      <span class="sec-total" id="misc-total">RM 0.00</span>
+      <button class="btn-rm-room" onclick="removeRoom(event,'misc')" title="Remove section">✕ Remove</button>
+      <div class="sec-move-btns">
+        <button class="btn-move-sec" onclick="moveSection(event,'up','misc')" title="Move up">↑</button>
+        <button class="btn-move-sec" onclick="moveSection(event,'down','misc')" title="Move down">↓</button>
+      </div>
+      <span class="chevron" onclick="toggleSec('misc')" style="cursor:pointer;padding:0 4px">▼</span>
+      <span class="sec-drag-handle" title="Drag to reorder section">⋮⋮</span>
+    </div>
+    <div class="sec-body open" id="misc-body-wrap">
+      <div class="grp-list" id="misc-grps">
+        <div class="grp-block base" data-group="">
+          <table class="items-tbl">
+            <thead><tr>
+              <th class="col-drag"></th>
+              <th class="col-desc">Description</th><th class="col-uom">UOM</th>
+              <th class="col-qty r">Qty</th><th class="col-price r">Unit Price (RM)</th>
+              <th class="col-amt r">Amount (RM)</th><th class="col-del"></th>
+            </tr></thead>
+            <tbody id="misc-tbody" class="grp-tbody"></tbody>
+          </table>
+          <div class="grp-actions" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+            <button class="btn-add-item" onclick="addItem('misc')">+ Add Item</button>
+            <button class="btn-add-item alt" onclick="openPresetMenu(event,'misc')">🎁 Insert Preset ▾</button>
+          </div>
+        </div>
+      </div>
+      <div class="sec-foot">
+        <button class="btn-add-group" onclick="addGroup('misc')">➕ Add Group</button>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /sections-wrap -->
+
+  <!-- Add room / section — sits after every category -->
+  <div class="add-room-row">
+    <input id="room-inp" class="room-inp" list="room-list" placeholder="Pick a room / section…" autocomplete="off">
+    <datalist id="room-list"></datalist>
+    <button class="btn-add-room" onclick="addRoomFromInput()">+ Add Section</button>
+  </div>
+
+  <!-- Terms -->
+  <div class="card">
+    <div class="card-title">Terms & Notes</div>
+    <div class="fg"><textarea id="f-terms" placeholder="e.g. 50% deposit upon confirmation, balance upon completion…"></textarea></div>
+  </div>
+
+  <!-- Totals -->
+  <div class="card">
+    <div class="totals-wrap">
+      <table class="totals-tbl">
+        <tr><td style="color:#888">Subtotal</td><td id="t-sub">RM 0.00</td></tr>
+        <tr>
+          <td style="color:#888">
+            Discount
+            <input id="f-discount" type="text" placeholder="e.g. 10% or 500"
+                   style="margin-left:6px;padding:4px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px;width:80px;font-family:inherit"
+                   oninput="recalc()">
+            <label style="margin-left:6px;font-size:11px;color:#888;cursor:pointer">
+              <input id="f-waive" type="checkbox" onchange="toggleWaive()" style="vertical-align:middle"> Waive
+            </label>
+          </td>
+          <td id="t-disc">- RM 0.00</td>
+        </tr>
+        <tr><td id="t-sst-lbl" style="color:#888">SST (6%)</td><td id="t-sst">RM 0.00</td></tr>
+        <tr class="grand"><td>TOTAL</td><td id="t-total">RM 0.00</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="secondary" onclick="history.back()">Cancel</button>
+    <button class="primary viewer-hide" id="btn-save" onclick="saveQuote()">Save Quotation</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Edit mode detection ────────────────────────────────────────────────────────
+const _editMatch = window.location.pathname.match(/^\/quote-edit\/(\d+)$/);
+const editId = _editMatch ? parseInt(_editMatch[1]) : null;
+
+// Package editor mode: /new-quote?package=<id> edits a saved package, ?package=new creates one
+const _pkgParam = new URLSearchParams(window.location.search).get('package');
+const pkgMode = _pkgParam !== null;
+let pkgEditId = (pkgMode && _pkgParam !== 'new') ? parseInt(_pkgParam) : null;
+let pkgName = '';
+let _pkgCatParam = null;  // ?cat= from a Library "＋ New under category" link (create only)
+
+// ── Materials ──────────────────────────────────────────────────────────────────
+let MATS = [];
+fetch('/products').then(r => r.json()).then(data => {
+  MATS = data.map(p => ({ ...p, desc: p.description }));
+});
+
+// Look up a product SKU's default Details by exact (case-insensitive) description.
+function detailsForDesc(desc) {
+  const key = (desc || '').trim().toLowerCase();
+  if (!key) return '';
+  const m = MATS.find(x => (x.desc || '').trim().toLowerCase() === key && x.details);
+  return m ? m.details : '';
+}
+
+// ── Preset Sets (loaded from server; see /presets router) ─────────────────
+let PRESETS = [];
+async function loadPresets() {
+  try {
+    const res = await fetch("/presets");
+    if (res.ok) PRESETS = await res.json();
+  } catch (e) { console.warn("preset load failed", e); }
+}
+
+let _presetTargetSid = null;
+
+function openPresetMenu(e, sid) {
+  e?.stopPropagation();
+  _presetTargetSid = sid;
+  let menu = document.getElementById('preset-menu');
+  if (!menu) {
+    menu = document.createElement('div');
+    menu.id = 'preset-menu';
+    menu.style.cssText = 'display:none;position:absolute;background:white;border:1px solid #e5e7eb;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.14);min-width:280px;z-index:800;padding:6px;max-height:70vh;overflow-y:auto';
+    document.body.appendChild(menu);
+  }
+  renderPresetMenu();
+  // Position under the clicked button
+  const btn = e.currentTarget;
+  const rect = btn.getBoundingClientRect();
+  menu.style.top  = (rect.bottom + window.scrollY + 4) + 'px';
+  menu.style.left = (rect.left   + window.scrollX) + 'px';
+  menu.style.display = 'block';
+  setTimeout(() => document.addEventListener('click', closePresetMenuOnce), 0);
+}
+function closePresetMenuOnce(e) {
+  const menu = document.getElementById('preset-menu');
+  if (menu && !menu.contains(e.target)) {
+    menu.style.display = 'none';
+    document.removeEventListener('click', closePresetMenuOnce);
+  }
+}
+
+function renderPresetMenu() {
+  const menu = document.getElementById('preset-menu');
+  menu.innerHTML = PRESETS.map((a, ai) => `
+    <div style="padding:8px 10px;font-size:11px;font-weight:700;color:#4a3b30;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #f0eaff;margin-top:${ai?6:0}px">${esc(a.area)}</div>
+    ${a.subs.map((sub, si) => {
+      const count = (sub.sets || []).reduce((n, s) => n + (s.items ? s.items.length : 0), 0);
+      return `<div class="preset-item" data-a="${ai}" data-s="${si}"
+             style="padding:8px 14px;font-size:13px;cursor:pointer;border-radius:6px;display:flex;justify-content:space-between;align-items:center">
+          <span>${esc(sub.name)}</span>
+          <span style="font-size:11px;color:#8a7364">${count} items</span>
+        </div>`;
+    }).join('')}
+  `).join('');
+  menu.querySelectorAll('.preset-item').forEach(el => {
+    el.addEventListener('mouseover', () => el.style.background = '#faf7f2');
+    el.addEventListener('mouseout',  () => el.style.background = '');
+    el.addEventListener('click', () => {
+      insertPreset(_presetTargetSid, +el.dataset.a, +el.dataset.s);
+      document.getElementById('preset-menu').style.display = 'none';
+    });
+  });
+}
+
+function insertPreset(target, ai, si) {
+  // `target` is a tbody prefix — a section id (base group) or a group id.
+  // A preset group (sub) inserts all of its items into the target.
+  const tbody = document.getElementById(target + '-tbody');
+  if (!tbody) { showToast('Target section missing', true); return; }
+  const area = PRESETS[ai];
+  const sub = area?.subs?.[si];
+  if (!sub) { showToast('Preset not found', true); return; }
+  const items = (sub.sets || []).reduce((arr, s) => arr.concat(s.items || []), []);
+
+  const secBlock = tbody.closest('.sec-block');
+  const body = secBlock?.querySelector('.sec-body');
+  const head = secBlock?.querySelector('.sec-head');
+  if (body && !body.classList.contains('open')) { body.classList.add('open'); head?.classList.add('open'); }
+
+  let inserted = 0;
+  for (const it of items) {
+    addItem(target, {
+      description: it.description,
+      uom:         it.uom,
+      qty:         it.qty ?? 1,
+      unit_price:  it.unit_price,
+    });
+    inserted++;
+  }
+  recalc();
+  showToast(`Inserted ${inserted} items ✓`);
+}
+
+// Discount input parser: accepts "10%", "10 %", "500" (RM), or empty
+function parseDiscount(subtotal) {
+  const raw = (document.getElementById('f-discount')?.value || '').trim();
+  const waived = document.getElementById('f-waive')?.checked;
+  if (waived) return subtotal;
+  if (!raw) return 0;
+  if (raw.endsWith('%')) {
+    const pct = parseFloat(raw.slice(0, -1));
+    if (!isFinite(pct) || pct <= 0) return 0;
+    return subtotal * (pct / 100);
+  }
+  const amt = parseFloat(raw);
+  return isFinite(amt) && amt > 0 ? amt : 0;
+}
+function toggleWaive() {
+  const waived = document.getElementById('f-waive').checked;
+  const inp = document.getElementById('f-discount');
+  inp.disabled = waived;
+  inp.style.opacity = waived ? 0.4 : 1;
+  recalc();
+}
+
+// section-id → room display name (used by autocomplete)
+const secRoomName = {};
+
+function matsForSection() {
+  return MATS; // search all products globally — keyword match takes priority over room grouping
+}
+
+// ── Room management ────────────────────────────────────────────────────────────
+const ALL_ROOMS     = ['Bed Room','Ceiling','Flooring','Kitchen','Wall & General'];
+const DEFAULT_ROOMS = ['Bed Room','Ceiling','Flooring','Kitchen','Wall & General'];
+
+function sidOf(name) {
+  return 'room-' + name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+}
+
+// Derive active room names from DOM (avoids maintaining parallel array)
+function getActiveRoomNames() {
+  const names = [];
+  document.querySelectorAll('#sections-wrap .sec-block').forEach(b => {
+    const sid = b.id.replace('block-', '');
+    if (sid !== 'design' && sid !== 'misc') names.push(secRoomName[sid] || sid);
+  });
+  return names;
+}
+
+function refreshRoomSelect() {
+  const dl = document.getElementById('room-list');
+  if (!dl) return;
+  // Always list every option — chosen sections stay selectable in the dropdown
+  dl.innerHTML = ALL_ROOMS.map(r => `<option value="${esc(r)}">`).join('');
+}
+
+function renderRoom(name, open) {
+  const sid = sidOf(name);
+  secRoomName[sid] = name;
+  const div = document.createElement('div');
+  div.className = 'sec-block';
+  div.id = 'block-' + sid;
+  div.innerHTML = `
+    <div class="sec-head ${open ? 'open' : ''}" id="head-${sid}">
+      <input class="sec-name-inp" id="secname-${sid}" value="${esc(name)}" onclick="event.stopPropagation()"
+             onblur="renameSection('${sid}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" title="Click to rename">
+      <span class="sec-total" id="${sid}-total">RM 0.00</span>
+      <button class="btn-rm-room" onclick="removeRoom(event,'${sid}')" title="Remove">✕ Remove</button>
+      <div class="sec-move-btns">
+        <button class="btn-move-sec" onclick="moveSection(event,'up','${sid}')" title="Move up">↑</button>
+        <button class="btn-move-sec" onclick="moveSection(event,'down','${sid}')" title="Move down">↓</button>
+      </div>
+      <span class="chevron" onclick="toggleSec('${sid}')" style="cursor:pointer;padding:0 4px">▼</span>
+      <span class="sec-drag-handle" title="Drag to reorder section">⋮⋮</span>
+    </div>
+    <div class="sec-body ${open ? 'open' : ''}" id="${sid}-body-wrap">
+      <div class="grp-list" id="${sid}-grps">
+        <div class="grp-block base" data-group="">
+          <table class="items-tbl">
+            <thead><tr>
+              <th class="col-drag"></th>
+              <th class="col-desc">Description</th><th class="col-uom">UOM</th>
+              <th class="col-qty r">Qty</th><th class="col-price r">Unit Price (RM)</th>
+              <th class="col-amt r">Amount (RM)</th><th class="col-del"></th>
+            </tr></thead>
+            <tbody id="${sid}-tbody" class="grp-tbody"></tbody>
+          </table>
+          <div class="grp-actions" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+            <button class="btn-add-item" onclick="addItem('${sid}')">+ Add Item</button>
+            <button class="btn-add-item alt" onclick="openPresetMenu(event,'${sid}')">🎁 Insert Preset ▾</button>
+          </div>
+        </div>
+      </div>
+      <div class="sec-foot">
+        <button class="btn-add-group" onclick="addGroup('${sid}')">➕ Add Group</button>
+      </div>
+    </div>`;
+  // Insert before misc so rooms always sit between design and misc by default
+  const miscBlock = document.getElementById('block-misc');
+  document.getElementById('sections-wrap').insertBefore(div, miscBlock);
+  wireSecDrag(div);
+}
+
+function toggleSec(sid) {
+  const head = document.getElementById('head-' + sid);
+  const body = document.getElementById(sid + '-body-wrap');
+  if (!head || !body) return;
+  const open = body.classList.contains('open');
+  body.classList.toggle('open', !open);
+  head.classList.toggle('open', !open);
+}
+
+function moveSection(e, dir, sid) {
+  e.stopPropagation();
+  const block = document.getElementById('block-' + sid);
+  if (!block) return;
+  if (dir === 'up') {
+    const prev = block.previousElementSibling;
+    if (prev && prev.classList.contains('sec-block')) prev.before(block);
+  } else {
+    const next = block.nextElementSibling;
+    if (next && next.classList.contains('sec-block')) next.after(block);
+  }
+  recalc();
+}
+
+function addRoomFromInput() {
+  const inp  = document.getElementById('room-inp');
+  const name = inp.value.trim();
+  if (!name) return;
+  if (getActiveRoomNames().map(r => r.toLowerCase()).includes(name.toLowerCase())) {
+    showToast('This section already exists', true); return;
+  }
+  renderRoom(name, true);
+  refreshRoomSelect();
+  inp.value = '';
+  inp.focus();
+}
+
+function removeRoom(e, sid) {
+  e.stopPropagation();
+  const currentName = secRoomName[sid] || sid;
+  if (!confirm(`Remove "${currentName}" section?`)) return;
+  delete secRoomName[sid];
+  document.getElementById('block-' + sid)?.remove();
+  refreshRoomSelect();
+  recalc();
+}
+
+function renameSection(sid, newName) {
+  const trimmed = newName.trim();
+  if (!trimmed) { document.getElementById('secname-' + sid).value = secRoomName[sid] || sid; return; }
+  secRoomName[sid] = trimmed;
+}
+
+// ── Groups (sub-categories within a section) ────────────────────────────────────
+let grpCnt = 0;
+
+// Create a named group inside section `sid`. Returns the group id (a tbody prefix).
+function addGroup(sid, name = 'New Group', open = true) {
+  const list = document.getElementById(sid + '-grps');
+  if (!list) return null;
+  const gid = 'grp' + (++grpCnt);
+  const block = document.createElement('div');
+  block.className = 'grp-block';
+  block.id = gid;
+  block.dataset.group = name;
+  block.innerHTML = `
+    <div class="grp-head">
+      <span class="grp-drag" title="Drag to move / reorder group">⋮⋮</span>
+      <input class="grp-name-inp" value="${esc(name)}" placeholder="Group name…"
+             onclick="event.stopPropagation()"
+             oninput="renameGroup('${gid}',this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+      <span class="grp-total" id="${gid}-total">RM 0.00</span>
+      <button class="btn-grp-del" title="Delete this whole group" onclick="removeGroup('${gid}')">✕</button>
+    </div>
+    <table class="items-tbl">
+      <thead><tr>
+        <th class="col-drag"></th>
+        <th class="col-desc">Description</th><th class="col-uom">UOM</th>
+        <th class="col-qty r">Qty</th><th class="col-price r">Unit Price (RM)</th>
+        <th class="col-amt r">Amount (RM)</th><th class="col-del"></th>
+      </tr></thead>
+      <tbody id="${gid}-tbody" class="grp-tbody"></tbody>
+    </table>
+    <div class="grp-actions" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+      <button class="btn-add-item" onclick="addItem('${gid}')">+ Add Item</button>
+      <button class="btn-add-item alt" onclick="openPresetMenu(event,'${gid}')">🎁 Insert Preset ▾</button>
+    </div>`;
+  list.appendChild(block);
+  wireGrpDrag(block);
+  // Ensure the section body is open so the new group is visible
+  const secBlock = list.closest('.sec-block');
+  const body = secBlock?.querySelector('.sec-body');
+  const head = secBlock?.querySelector('.sec-head');
+  if (body && !body.classList.contains('open')) { body.classList.add('open'); head?.classList.add('open'); }
+  if (window.__viewer) block.querySelectorAll('.viewer-hide').forEach(el => el.style.display = 'none');
+  return gid;
+}
+
+function removeGroup(gid) {
+  const block = document.getElementById(gid);
+  if (!block) return;
+  const name = block.dataset.group || 'this group';
+  const hasItems = block.querySelectorAll('.grp-tbody tr').length > 0;
+  if (hasItems && !confirm(`Delete the "${name}" group and all its items?`)) return;
+  block.remove();
+  recalc();
+}
+
+function renameGroup(gid, newName) {
+  const block = document.getElementById(gid);
+  if (block) block.dataset.group = newName.trim();
+}
+
+// Group drag: reorder within a section or move to another section (which
+// re-assigns the items to that section's category on save).
+let _dragGrp = null;
+
+function wireGrpDrag(block) {
+  const handle = block.querySelector('.grp-drag');
+  if (!handle) return;
+  handle.setAttribute('draggable', 'true');
+  handle.addEventListener('dragstart', e => {
+    _dragGrp = block;
+    block.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', 'grp');
+    e.stopPropagation();
+  });
+  handle.addEventListener('dragend', () => {
+    block.classList.remove('dragging');
+    document.querySelectorAll('.grp-block.drop-above,.grp-block.drop-below,.grp-list.drop-empty-grp')
+      .forEach(el => el.classList.remove('drop-above', 'drop-below', 'drop-empty-grp'));
+    _dragGrp = null;
+  });
+}
+
+// ── Drag & drop ────────────────────────────────────────────────────────────────
+// Sections: drag by the ⋮⋮ handle in the head; drop between other sections.
+// Rows: drag by the ⋮⋮ handle at start of each row; drop into any section's tbody.
+let _dragRow = null;
+let _dragSec = null;
+
+function wireRowDrag(tr) {
+  const handle = tr.querySelector('.col-drag');
+  if (!handle) return;
+  // Only the handle is draggable — keeps inputs selectable normally
+  handle.setAttribute('draggable', 'true');
+  handle.addEventListener('dragstart', e => {
+    _dragRow = tr;
+    tr.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', 'row');
+  });
+  handle.addEventListener('dragend', () => {
+    tr.classList.remove('dragging');
+    document.querySelectorAll('.drop-above,.drop-below,.drop-empty').forEach(el => {
+      el.classList.remove('drop-above','drop-below','drop-empty');
+    });
+    _dragRow = null;
+  });
+}
+
+document.addEventListener('dragover', e => {
+  if (_dragRow) {
+    const overRow = e.target.closest('tr[data-id]');
+    const overBody = e.target.closest('tbody[id$="-tbody"]');
+    if (overRow && overRow !== _dragRow) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      const rect = overRow.getBoundingClientRect();
+      const before = (e.clientY - rect.top) < rect.height / 2;
+      document.querySelectorAll('.drop-above,.drop-below').forEach(el => el.classList.remove('drop-above','drop-below'));
+      overRow.classList.add(before ? 'drop-above' : 'drop-below');
+    } else if (overBody && !overBody.querySelector('tr[data-id]')) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      document.querySelectorAll('.drop-empty').forEach(el => el.classList.remove('drop-empty'));
+      overBody.classList.add('drop-empty');
+    }
+  } else if (_dragGrp) {
+    const overGrp = e.target.closest('.grp-block');
+    const overList = e.target.closest('.grp-list');
+    document.querySelectorAll('.grp-block.drop-above,.grp-block.drop-below,.grp-list.drop-empty-grp')
+      .forEach(el => el.classList.remove('drop-above','drop-below','drop-empty-grp'));
+    if (overGrp && overGrp !== _dragGrp) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      const rect = overGrp.getBoundingClientRect();
+      let before = (e.clientY - rect.top) < rect.height / 2;
+      if (overGrp.classList.contains('base')) before = false;  // never above ungrouped base
+      overGrp.classList.add(before ? 'drop-above' : 'drop-below');
+    } else if (overList && !overList.contains(_dragGrp)) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      overList.classList.add('drop-empty-grp');
+    }
+  } else if (_dragSec) {
+    const overSec = e.target.closest('.sec-block');
+    if (overSec && overSec !== _dragSec) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      const rect = overSec.getBoundingClientRect();
+      const before = (e.clientY - rect.top) < rect.height / 2;
+      document.querySelectorAll('.sec-block.drop-above,.sec-block.drop-below').forEach(el => el.classList.remove('drop-above','drop-below'));
+      overSec.classList.add(before ? 'drop-above' : 'drop-below');
+    }
+  }
+});
+
+document.addEventListener('drop', e => {
+  if (_dragRow) {
+    e.preventDefault();
+    const overRow = e.target.closest('tr[data-id]');
+    const overBody = e.target.closest('tbody[id$="-tbody"]');
+    if (overRow && overRow !== _dragRow) {
+      const before = overRow.classList.contains('drop-above');
+      overRow.parentNode.insertBefore(_dragRow, before ? overRow : overRow.nextSibling);
+    } else if (overBody && !overBody.querySelector('tr[data-id]')) {
+      overBody.appendChild(_dragRow);
+    }
+    recalc();
+  } else if (_dragGrp) {
+    e.preventDefault();
+    const overGrp = e.target.closest('.grp-block');
+    const overList = e.target.closest('.grp-list');
+    if (overGrp && overGrp !== _dragGrp) {
+      let before = overGrp.classList.contains('drop-above');
+      if (overGrp.classList.contains('base')) before = false;  // keep ungrouped base first
+      overGrp.parentNode.insertBefore(_dragGrp, before ? overGrp : overGrp.nextSibling);
+    } else if (overList && !overList.contains(_dragGrp)) {
+      overList.appendChild(_dragGrp);
+    }
+    recalc();
+  } else if (_dragSec) {
+    e.preventDefault();
+    const overSec = e.target.closest('.sec-block');
+    if (overSec && overSec !== _dragSec) {
+      const before = overSec.classList.contains('drop-above');
+      overSec.parentNode.insertBefore(_dragSec, before ? overSec : overSec.nextSibling);
+    }
+    recalc();
+  }
+});
+
+function wireSecDrag(block) {
+  const handle = block.querySelector('.sec-drag-handle');
+  if (!handle) return;
+  handle.setAttribute('draggable', 'true');
+  handle.addEventListener('dragstart', e => {
+    _dragSec = block;
+    block.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', 'sec');
+  });
+  handle.addEventListener('dragend', () => {
+    block.classList.remove('dragging');
+    document.querySelectorAll('.sec-block.drop-above,.sec-block.drop-below').forEach(el => el.classList.remove('drop-above','drop-below'));
+    _dragSec = null;
+  });
+}
+
+function wireAllSecDrags() {
+  document.querySelectorAll('#sections-wrap .sec-block').forEach(wireSecDrag);
+}
+
+// ── Item rows ──────────────────────────────────────────────────────────────────
+let rowCnt = 0;
+
+function addItem(sid, prefill = null) {
+  const tbody = document.getElementById(sid + '-tbody');
+  if (!tbody) return;
+  const rowId = 'r' + (++rowCnt);
+
+  const tr = document.createElement('tr');
+  tr.dataset.id = rowId;
+  tr.innerHTML = `
+    <td class="col-drag" title="Drag to reorder">⋮⋮</td>
+    <td class="col-desc"><div class="ac-wrap">
+      <input class="desc-inp" type="text" placeholder="Type to search or enter…" autocomplete="off">
+      <div class="ac-drop" id="ac-${rowId}"></div>
+    </div>
+    <textarea class="details-inp" rows="1" placeholder="Details" autocomplete="off"></textarea></td>
+    <td class="col-uom"><input class="uom-inp" type="text" placeholder="Fr"></td>
+    <td class="col-qty"><input class="qty-inp" type="number" value="1" min="0" step="0.5" style="text-align:right"></td>
+    <td class="col-price"><input class="price-inp" type="number" value="0" min="0" step="1" style="text-align:right"></td>
+    <td class="col-amt" id="${rowId}-amt">0.00</td>
+    <td class="col-del"><button class="btn-del" title="Remove row">×</button></td>`;
+  wireRowDrag(tr);
+
+  tbody.appendChild(tr);
+
+  const descInp    = tr.querySelector('.desc-inp');
+  const detailsInp = tr.querySelector('.details-inp');
+  const qtyInp     = tr.querySelector('.qty-inp');
+  const priceInp   = tr.querySelector('.price-inp');
+  const acDrop     = tr.querySelector('.ac-drop');
+  const delBtn     = tr.querySelector('.btn-del');
+
+  // Details is a multi-line field: auto-grow, and Alt+Enter inserts a line break
+  // (plain Enter commits/blurs instead of adding a stray newline).
+  function growDetails() {
+    detailsInp.style.height = 'auto';
+    detailsInp.style.height = detailsInp.scrollHeight + 'px';
+  }
+  detailsInp.addEventListener('input', growDetails);
+  detailsInp.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    if (e.altKey || e.shiftKey) {
+      const s = detailsInp.selectionStart, en = detailsInp.selectionEnd, v = detailsInp.value;
+      detailsInp.value = v.slice(0, s) + '\n' + v.slice(en);
+      detailsInp.selectionStart = detailsInp.selectionEnd = s + 1;
+      growDetails();
+    } else {
+      detailsInp.blur();
+    }
+  });
+
+  let pool = [];
+  let hiIdx = -1;
+
+  function renderDropdown(q) {
+    if (q.length < 1) { acDrop.style.display = 'none'; return; }
+    const src = matsForSection();
+    // Token (AND) search: every word in the query must appear somewhere in the
+    // product's type / description / uom, in any order. So "mfc tall cabinet"
+    // matches "MFC Tall / Full height Cabinet (600mm D x up to 2700mm H)".
+    const tokens = q.split(/\s+/).filter(Boolean);
+    pool = src
+      .map(m => {
+        const desc = (m.desc || '').toLowerCase();
+        const hay  = ((m.type || '') + ' ' + (m.desc || '') + ' ' + (m.uom || '')).toLowerCase();
+        if (!tokens.every(t => hay.includes(t))) return null;
+        // Rank: whole phrase in description first, then description-word hits,
+        // then shorter descriptions as a tie-breaker.
+        let score = 0;
+        if (desc.includes(q)) score += 100;
+        if (desc.startsWith(tokens[0])) score += 20;
+        score += tokens.reduce((s, t) => desc.includes(t) ? s + 5 : s, 0);
+        return { m, score };
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.score - a.score || (a.m.desc || '').length - (b.m.desc || '').length)
+      .slice(0, 14)
+      .map(x => x.m);
+    if (!pool.length) { acDrop.style.display = 'none'; return; }
+    hiIdx = -1;
+    acDrop.innerHTML = pool.map((m, i) => `
+      <div class="ac-item" data-i="${i}">
+        <span class="ac-desc">${esc(m.desc)}</span>
+        <span class="ac-tag">${esc(m.type)} · ${esc(m.uom)}</span>
+        <span class="ac-price">RM ${m.price}</span>
+      </div>`).join('');
+    acDrop.style.display = 'block';
+    acDrop.querySelectorAll('.ac-item').forEach(el => {
+      el.addEventListener('mousedown', e => { e.preventDefault(); pick(pool[+el.dataset.i]); });
+    });
+  }
+
+  function pick(m) {
+    descInp.value  = m.desc;
+    tr.querySelector('.uom-inp').value   = m.uom   || '';
+    priceInp.value = m.price || 0;
+    detailsInp.value = m.details || '';   // seed spec text from the product SKU (editable)
+    growDetails();
+    acDrop.style.display = 'none';
+    recalcRow();
+    qtyInp.select();
+    qtyInp.focus();
+  }
+
+  function recalcRow() {
+    const amt = (parseFloat(qtyInp.value) || 0) * (parseFloat(priceInp.value) || 0);
+    document.getElementById(rowId + '-amt').textContent = fmt(amt);
+    recalc();
+  }
+
+  descInp.addEventListener('input', () => {
+    renderDropdown(descInp.value.trim().toLowerCase());
+    recalcRow();
+  });
+  descInp.addEventListener('keydown', e => {
+    const items = acDrop.querySelectorAll('.ac-item');
+    if (!items.length || acDrop.style.display === 'none') return;
+    if (e.key === 'ArrowDown')  { e.preventDefault(); hiIdx = Math.min(hiIdx + 1, items.length - 1); }
+    else if (e.key === 'ArrowUp')    { e.preventDefault(); hiIdx = Math.max(hiIdx - 1, 0); }
+    else if (e.key === 'Enter' && hiIdx >= 0) { e.preventDefault(); pick(pool[hiIdx]); return; }
+    else if (e.key === 'Escape') { acDrop.style.display = 'none'; return; }
+    items.forEach((el, i) => el.classList.toggle('hi', i === hiIdx));
+  });
+  descInp.addEventListener('blur', () => setTimeout(() => { acDrop.style.display = 'none'; }, 160));
+  qtyInp.addEventListener('input',   recalcRow);
+  priceInp.addEventListener('input', recalcRow);
+  delBtn.addEventListener('click', () => { tr.remove(); recalc(); });
+
+  if (prefill) {
+    descInp.value  = prefill.description || '';
+    tr.querySelector('.uom-inp').value   = prefill.uom || '';
+    qtyInp.value   = prefill.qty ?? 1;
+    priceInp.value = prefill.unit_price ?? 0;
+    // Edit mode passes the item's saved details; preset/package inserts don't, so
+    // seed those from the matching product SKU by description.
+    detailsInp.value = (prefill.details != null) ? prefill.details : detailsForDesc(prefill.description);
+    growDetails();
+    const amt = (prefill.qty || 0) * (prefill.unit_price || 0);
+    document.getElementById(rowId + '-amt').textContent = fmt(amt);
+  } else {
+    descInp.focus();
+  }
+  recalc();
+}
+
+// ── Recalc totals ──────────────────────────────────────────────────────────────
+function recalc() {
+  let sub = 0;
+
+  document.querySelectorAll('#sections-wrap .sec-block').forEach(b => {
+    const sid = b.id.replace('block-', '');
+    let secTot = 0;
+    b.querySelectorAll('.grp-block').forEach(g => {
+      let gt = 0;
+      g.querySelectorAll('.grp-tbody tr').forEach(tr => {
+        gt += (parseFloat(tr.querySelector('.qty-inp')?.value) || 0) *
+              (parseFloat(tr.querySelector('.price-inp')?.value) || 0);
+      });
+      const gEl = g.querySelector('.grp-total');
+      if (gEl) gEl.textContent = 'RM ' + fmt(gt);
+      secTot += gt;
+    });
+    const el = document.getElementById(sid + '-total');
+    if (el) el.textContent = 'RM ' + fmt(secTot);
+    sub += secTot;
+  });
+
+  const rate = parseFloat(document.getElementById('f-sst').value) || 0;
+  const discount = Math.min(parseDiscount(sub), sub);  // never below 0
+  const netSub = sub - discount;
+  const sst  = netSub * rate;
+  document.getElementById('t-sub').textContent     = 'RM ' + fmt(sub);
+  document.getElementById('t-disc').textContent    = '- RM ' + fmt(discount);
+  document.getElementById('t-sst-lbl').textContent = `SST (${Math.round(rate * 100)}%)`;
+  document.getElementById('t-sst').textContent     = 'RM ' + fmt(sst);
+  document.getElementById('t-total').textContent   = 'RM ' + fmt(netSub + sst);
+}
+
+// ── Collect items ──────────────────────────────────────────────────────────────
+function collectItems() {
+  const items = [];
+  let order = 0;
+
+  document.querySelectorAll('#sections-wrap .sec-block').forEach(b => {
+    const sid = b.id.replace('block-', '');
+    // design and misc always save with fixed category keys regardless of display name
+    const cat = (sid === 'design' || sid === 'misc') ? sid : (secRoomName[sid] || sid);
+    b.querySelectorAll('.grp-block').forEach(g => {
+      const gname = (g.dataset.group || '').trim();
+      g.querySelectorAll('.grp-tbody tr').forEach(tr => {
+        const desc = tr.querySelector('.desc-inp')?.value.trim();
+        if (!desc) return;
+        items.push({
+          category:   cat,
+          group_name: gname || null,
+          description: desc,
+          details:    tr.querySelector('.details-inp')?.value.trim() || null,
+          uom:        tr.querySelector('.uom-inp')?.value.trim()   || '',
+          qty:        parseFloat(tr.querySelector('.qty-inp')?.value)   || 0,
+          unit_price: parseFloat(tr.querySelector('.price-inp')?.value) || 0,
+          sort_order: order++,
+        });
+      });
+    });
+  });
+
+  // Append discount as a synthetic misc item so the server-side total reflects it.
+  // (No DB schema change required.)
+  const sub = items.reduce((a, i) => a + i.qty * i.unit_price, 0);
+  const discountAmt = Math.min(parseDiscount(sub), sub);
+  if (discountAmt > 0) {
+    const waived = document.getElementById('f-waive')?.checked;
+    const raw = (document.getElementById('f-discount')?.value || '').trim();
+    const label = waived ? 'Discount (waived)' : (raw.endsWith('%') ? `Discount (${raw})` : 'Discount');
+    items.push({
+      category: 'misc',
+      description: label,
+      uom: '',
+      qty: 1,
+      unit_price: -Math.round(discountAmt * 100) / 100,
+      sort_order: order++,
+    });
+  }
+  return items;
+}
+
+// ── Load existing quote (edit mode) ───────────────────────────────────────────
+async function populateFromQuote(quoteId) {
+  const q = await fetch('/quotes/' + quoteId).then(r => r.json());
+  if (!q || q.detail) { showToast('Quote not found', true); return; }
+
+  document.getElementById('f-client').value  = q.client_name     || '';
+  document.getElementById('f-phone').value   = q.client_phone    || '';
+  document.getElementById('f-address').value = q.project_address || '';
+  document.getElementById('f-valid').value   = q.valid_until     || '';
+  document.getElementById('f-sst').value     = String(q.sst_rate ?? 0.06);
+  document.getElementById('f-terms').value   = q.terms_notes     || '';
+  if (q.project_type) document.getElementById('f-ptype').value = q.project_type;
+  document.getElementById('f-size').value  = q.size_range   || '';
+  document.getElementById('f-theme').value = q.design_theme || '';
+  document.getElementById('f-condo').value = q.condo_name   || '';
+
+  // Extract synthetic "Discount" line item back into the discount input
+  const rawItems = (q.items || []);
+  const discountIdx = rawItems.findIndex(
+    it => it.category === 'misc' && /^discount\b/i.test((it.description || '').trim())
+  );
+  if (discountIdx >= 0) {
+    const d = rawItems[discountIdx];
+    if (/waived/i.test(d.description)) {
+      document.getElementById('f-waive').checked = true;
+      toggleWaive();
+    } else {
+      const pctMatch = d.description.match(/\((\d+(\.\d+)?%)\)/);
+      document.getElementById('f-discount').value = pctMatch ? pctMatch[1] : String(Math.abs(d.unit_price));
+    }
+    rawItems.splice(discountIdx, 1);  // don't render it as a normal row
+  }
+
+  // Group items by category, remembering the order categories first appear.
+  // Items arrive sorted by sort_order, so first-appearance == the saved section order.
+  rawItems.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+  const byCat = {};
+  const catOrder = [];
+  rawItems.forEach(item => {
+    if (!byCat[item.category]) { byCat[item.category] = []; catOrder.push(item.category); }
+    byCat[item.category].push(item);
+  });
+
+  // Design Fee / Miscellaneous are hardcoded blocks — drop them if this quote
+  // has no items there, so a deleted section stays deleted after reopening.
+  ['design', 'misc'].forEach(k => {
+    if (!byCat[k]) document.getElementById('block-' + k)?.remove();
+  });
+
+  // Create room sections for non-standard categories
+  for (const cat of catOrder) {
+    if (cat !== 'design' && cat !== 'misc') {
+      const sid = sidOf(cat);
+      if (!document.getElementById('block-' + sid)) renderRoom(cat, true);
+    }
+  }
+  refreshRoomSelect();
+
+  // Fill items into each section, re-creating named sub-groups as needed
+  for (const cat of catOrder) {
+    const items = byCat[cat];
+    const sid = (cat === 'design' || cat === 'misc') ? cat : sidOf(cat);
+    const groupGid = {};  // group name -> gid within this section
+    items.forEach(item => {
+      const gname = (item.group_name || '').trim();
+      let target = sid;
+      if (gname) {
+        if (!groupGid[gname]) groupGid[gname] = addGroup(sid, gname, true);
+        target = groupGid[gname];
+      }
+      addItem(target, item);
+    });
+  }
+
+  // Reorder the section blocks to match the saved order (so rearranging sticks)
+  const wrap = document.getElementById('sections-wrap');
+  catOrder.forEach(cat => {
+    const sid = (cat === 'design' || cat === 'misc') ? cat : sidOf(cat);
+    const block = document.getElementById('block-' + sid);
+    if (block) wrap.appendChild(block);
+  });
+
+  recalc();
+}
+
+// ── Package editor mode ────────────────────────────────────────────────────────
+async function initPackageMode() {
+  document.querySelector('.page-title').textContent = pkgEditId ? 'Edit Package' : 'New Package';
+  // Hide the Client & Project card and the load/save package bar — not relevant to a template
+  const clientCard = document.querySelector('.main > .card');
+  if (clientCard) clientCard.style.display = 'none';
+  const bar = document.querySelector('.pkg-bar');
+  if (bar) bar.style.display = 'none';
+  document.getElementById('btn-save').textContent = '💾 Save Package';
+
+  // Package details bar — name is editable during creation ("renamable")
+  const meta = document.createElement('div');
+  meta.className = 'card';
+  meta.innerHTML = `
+    <div class="card-title">Package Details</div>
+    <div class="form-grid">
+      <div class="fg"><label>Package Name *</label><input id="pkg-name" type="text" placeholder="e.g. Essential"></div>
+      <div class="fg"><label>Subtitle</label><input id="pkg-sub" type="text" placeholder="e.g. 1,000–1,200 sqft · 2 rooms"></div>
+    </div>`;
+  document.querySelector('.page-title').after(meta);
+
+  if (pkgEditId) {
+    try {
+      const list = await fetch('/packages?kind=quote').then(r => r.json());
+      const pkg = (list || []).find(p => p.id === pkgEditId);
+      if (!pkg) { showToast('Package not found', true); return; }
+      pkgName = pkg.name;
+      document.querySelector('.page-title').textContent = 'Edit Package · ' + pkg.name;
+      document.getElementById('pkg-name').value = pkg.name || '';
+      document.getElementById('pkg-sub').value = pkg.subtitle || '';
+      applyQuoteData(pkg.data || {});
+    } catch (e) { showToast('Failed to load package', true); }
+  } else {
+    const params = new URLSearchParams(window.location.search);
+    // Category is managed on the Library packages tab, not shown here. A "＋ New"
+    // link under a category still files the new package there via ?cat=.
+    _pkgCatParam = params.get('cat') || null;
+    if (params.get('name')) document.getElementById('pkg-name').value = params.get('name');
+    document.getElementById('f-terms').value = DEFAULT_TERMS;
+    recalc();
+  }
+}
+
+async function savePackage() {
+  const btn = document.getElementById('btn-save');
+  const nameEl = document.getElementById('pkg-name');
+  const name = (nameEl?.value || '').trim();
+  if (!name) { showToast('Please enter a package name', true); nameEl?.focus(); return; }
+  const subtitle = (document.getElementById('pkg-sub')?.value || '').trim();
+  const data = serializeQuote();
+  const old = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    // No category field on this form. On edit, omit category so the one set on the
+    // Library tab is preserved; on create, carry a ?cat= from a category's "＋ New" link.
+    const payload = { name, subtitle, data };
+    const res = pkgEditId
+      ? await fetch('/packages/' + pkgEditId, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+      : await fetch('/packages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...payload, kind: 'quote', category: _pkgCatParam }) });
+    if (res.redirected || res.url.includes('/login')) {
+      showToast('Session expired — redirecting…', true);
+      setTimeout(() => window.location.href = '/login', 1200);
+      return;
+    }
+    if (res.ok) {
+      showToast(`Package "${name}" saved ✓`);
+      setTimeout(() => window.location.href = '/admin/presets#packages', 700);
+    } else {
+      const e = await res.json().catch(() => ({}));
+      showToast(e.detail || 'Save failed', true);
+      btn.disabled = false; btn.textContent = old;
+    }
+  } catch (e) {
+    showToast('Cannot reach server', true);
+    btn.disabled = false; btn.textContent = old;
+  }
+}
+
+// ── Save ───────────────────────────────────────────────────────────────────────
+async function saveQuote() {
+  if (pkgMode) return savePackage();
+  const clientEl = document.getElementById('f-client');
+  const client   = clientEl.value.trim();
+  if (!client) {
+    clientEl.style.borderColor = '#ef4444';
+    clientEl.focus();
+    clientEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    showToast('Please enter the client name first', true);
+    clientEl.addEventListener('input', () => { clientEl.style.borderColor = ''; }, { once: true });
+    return;
+  }
+
+  const btn = document.getElementById('btn-save');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  const params = new URLSearchParams(window.location.search);
+  const body = {
+    client_name:     client,
+    client_phone:    document.getElementById('f-phone').value.trim()   || null,
+    project_address: document.getElementById('f-address').value.trim() || null,
+    project_type:    document.getElementById('f-ptype').value          || null,
+    size_range:      document.getElementById('f-size').value           || null,
+    design_theme:    document.getElementById('f-theme').value.trim()   || null,
+    condo_name:      document.getElementById('f-condo').value.trim()   || null,
+    valid_until:     document.getElementById('f-valid').value          || null,
+    terms_notes:     document.getElementById('f-terms').value.trim()   || null,
+    sst_rate:        parseFloat(document.getElementById('f-sst').value) || 0,
+    items:           collectItems(),
+    lead_id:         params.get('lead_id') ? parseInt(params.get('lead_id')) : null,
+  };
+
+  let res;
+  try {
+    if (editId) {
+      delete body.lead_id;
+      res = await fetch('/quotes/' + editId, { method: 'PATCH', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    } else {
+      res = await fetch('/quotes', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    }
+  } catch(err) {
+    showToast('Cannot reach server — check if it is running', true);
+    btn.disabled = false; btn.textContent = 'Save Quotation';
+    return;
+  }
+
+  // Session expired → server redirected to login page
+  if (res.redirected || res.url.includes('/login')) {
+    showToast('Session expired — redirecting to login…', true);
+    setTimeout(() => window.location.href = '/login', 1500);
+    return;
+  }
+
+  if (res.ok) {
+    const q = await res.json();
+    window.location.href = '/quote/' + q.id;
+  } else {
+    const text = await res.text();
+    let msg = `Save failed (${res.status})`;
+    try { const e = JSON.parse(text); msg = e.detail || JSON.stringify(e); } catch(e) { msg = text.slice(0,200); }
+    showToast(msg, true);
+    console.error('Save error', res.status, text);
+    btn.disabled = false; btn.textContent = 'Save Quotation';
+  }
+}
+
+const DEFAULT_TERMS =
+`TERMS & CONDITIONS
+
+1. Price Validity: This quotation is valid for 21 days from the date hereof.
+
+2. Measurement & Drawings:
+   • Up to five (5) revisions of 3D drawings are included; additional revisions will be chargeable.
+   • All dimensions are subject to final site measurement.
+   • Shop drawings will be provided for confirmation prior to production.
+   • Production will only proceed upon client's written approval of drawings and material selection.
+
+3. Payment Terms:
+   • 10% Deposit upon confirmation of quotation.
+   • 30% Progressive payment prior to commencement of work.
+   • 40% Progressive payment upon 50% completion of work.
+   • 15% Progressive payment upon 85% completion of work.
+   • 5% Payment upon 100% completion of work (within 21 days).
+   • All payments shall be made according to the agreed schedule. The company reserves the right to suspend work in the event of delayed payment.
+   • All cheques should be crossed and made payable to "MORDEZ SDN BHD".
+   • Bank: MAYBANK (A/C: 5643 9720 3875)
+
+4. Cancellation Policy: Deposit is non-refundable once shop drawings have commenced.
+
+5. Order Confirmation: Order is confirmed upon receipt of signed quotation, or written confirmation, together with deposit payment.
+
+6. Site Readiness & Access:
+   • Client shall ensure the site is ready for installation, including completed wet works, flooring, ceiling, and provision of electrical and plumbing points.
+   • Any delay caused by site conditions, restricted access, last-minute schedule changes, or coordination issues may result in timeline adjustments and additional costs.
+
+7. Variation Order (VO): Any changes after confirmation (including design, dimensions, materials, finishes, or accessories) will be treated as a Variation Order, subject to additional cost and extension of time.
+
+8. Ownership of Goods: All cabinets, materials, and installed items remain the property of the company until full payment is received.
+
+9. Warranty:
+   • 12 months workmanship warranty from date of completion.
+   • Kitchen accessories and appliances are subject to manufacturer's warranty.
+   • Excludes: Normal wear & tear, misuse/overloading/improper maintenance, third-party modifications.
+
+10. Care & Maintenance:
+    • Client is advised to avoid excessive water exposure, heavy impact, and use of harsh chemicals.
+    • Proper care will prolong the lifespan of cabinetry.
+
+We trust the above quotation will meet with your requirements and hope to receive your official order. Should you require any further information, please do not hesitate to contact us immediately.`;
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+async function init() {
+  document.getElementById('f-sst').addEventListener('change', recalc);
+  document.getElementById('room-inp').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); addRoomFromInput(); }
+  });
+  wireAllSecDrags();
+  await loadPresets();
+
+  if (pkgMode) {
+    await initPackageMode();
+    return;
+  }
+
+  if (editId) {
+    document.querySelector('.page-title').textContent = 'Edit Quotation';
+    document.getElementById('btn-save').textContent   = 'Update Quotation';
+    await populateFromQuote(editId);
+    return;
+  }
+
+  // Create mode defaults
+  DEFAULT_ROOMS.forEach((name, i) => renderRoom(name, i === 0));
+  refreshRoomSelect();
+
+  const d = new Date(); d.setDate(d.getDate() + 30);
+  document.getElementById('f-valid').value = d.toISOString().slice(0, 10);
+
+  document.getElementById('f-terms').value = DEFAULT_TERMS;
+
+  recalc();
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('lead_id')) {
+    try {
+      const lead = await fetch('/leads/' + params.get('lead_id')).then(r => r.json());
+      document.getElementById('f-client').value  = lead.full_name || '';
+      document.getElementById('f-phone').value   = lead.phone     || '';
+      document.getElementById('f-address').value = lead.location  || '';
+      if (lead.project_type) document.getElementById('f-ptype').value = lead.project_type;
+    } catch(e) {}
+  }
+}
+
+// ── Preset packages (save / load / delete) ─────────────────────────────────────
+// Snapshot the current quote's sections + groups + items (client details excluded).
+function serializeQuote() {
+  const sections = [];
+  document.querySelectorAll('#sections-wrap .sec-block').forEach(b => {
+    const sid = b.id.replace('block-', '');
+    const special = (sid === 'design' || sid === 'misc') ? sid : null;
+    const nameInp = b.querySelector('.sec-name-inp');
+    const name = special
+      ? (nameInp?.value.trim() || (sid === 'design' ? 'Design Fee' : 'Miscellaneous'))
+      : (secRoomName[sid] || sid);
+    const open = b.querySelector('.sec-body')?.classList.contains('open') !== false;
+    const groups = [];
+    b.querySelectorAll('.grp-block').forEach(g => {
+      const gname = (g.dataset.group || '').trim();
+      const gitems = [];
+      g.querySelectorAll('.grp-tbody tr').forEach(tr => {
+        const desc = tr.querySelector('.desc-inp')?.value.trim();
+        if (!desc) return;
+        gitems.push({
+          description: desc,
+          details:    tr.querySelector('.details-inp')?.value || null,
+          uom:        tr.querySelector('.uom-inp')?.value.trim()   || '',
+          qty:        parseFloat(tr.querySelector('.qty-inp')?.value)   || 0,
+          unit_price: parseFloat(tr.querySelector('.price-inp')?.value) || 0,
+        });
+      });
+      if (gitems.length || gname) groups.push({ name: gname, items: gitems });
+    });
+    sections.push({ key: special, name, open, groups });
+  });
+  return {
+    sst_rate:    parseFloat(document.getElementById('f-sst').value) || 0,
+    terms_notes: document.getElementById('f-terms').value || '',
+    discount: {
+      raw:   (document.getElementById('f-discount')?.value || '').trim(),
+      waive: !!document.getElementById('f-waive')?.checked,
+    },
+    sections,
+  };
+}
+
+function applyGroupsToSection(sid, groups) {
+  groups.forEach(g => {
+    const gname = (g.name || '').trim();
+    const target = gname ? addGroup(sid, gname, true) : sid;
+    (g.items || []).forEach(it => addItem(target, {
+      description: it.description, details: it.details, uom: it.uom, qty: it.qty, unit_price: it.unit_price,
+    }));
+  });
+}
+
+// Replace the current sections/items/terms/discount with a saved package.
+function applyQuoteData(data) {
+  const sections = data.sections || [];
+  // Design Fee / Miscellaneous are hardcoded blocks. Keep one only if this
+  // package actually has items there — otherwise drop it so it disappears by
+  // default instead of lingering empty after a move/delete + reopen.
+  const keepSpecial = new Set(
+    sections
+      .filter(s => (s.key === 'design' || s.key === 'misc')
+                   && (s.groups || []).some(g => (g.items || []).length))
+      .map(s => s.key)
+  );
+
+  document.querySelectorAll('#sections-wrap .sec-block').forEach(b => {
+    const sid = b.id.replace('block-', '');
+    if (sid === 'design' || sid === 'misc') {
+      if (!keepSpecial.has(sid)) { b.remove(); return; }
+      b.querySelectorAll('.grp-block:not(.base)').forEach(g => g.remove());
+      const base = b.querySelector('.grp-tbody');
+      if (base) base.innerHTML = '';
+    } else {
+      delete secRoomName[sid];
+      b.remove();
+    }
+  });
+
+  if (data.sst_rate != null) document.getElementById('f-sst').value = String(data.sst_rate);
+  if (data.terms_notes != null) document.getElementById('f-terms').value = data.terms_notes;
+  if (data.discount) {
+    const dInp = document.getElementById('f-discount');
+    const wInp = document.getElementById('f-waive');
+    if (dInp) dInp.value = data.discount.raw || '';
+    if (wInp) wInp.checked = !!data.discount.waive;
+    toggleWaive();
+  }
+
+  sections.forEach(sec => {
+    let sid;
+    if (sec.key === 'design' || sec.key === 'misc') {
+      if (!keepSpecial.has(sec.key)) return;  // dropped empty special section
+      sid = sec.key;
+      const inp = document.getElementById('secname-' + sid);
+      if (inp && sec.name) inp.value = sec.name;
+    } else {
+      renderRoom(sec.name, sec.open !== false);
+      sid = sidOf(sec.name);
+    }
+    applyGroupsToSection(sid, sec.groups || []);
+  });
+
+  refreshRoomSelect();
+  recalc();
+}
+
+async function saveAsPackage() {
+  const name = prompt('Save this quotation as a reusable package.\n\nName:');
+  if (name === null) return;
+  const trimmed = name.trim();
+  if (!trimmed) { showToast('Please enter a name', true); return; }
+  try {
+    const res = await fetch('/packages', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: trimmed, kind: 'quote', data: serializeQuote() }),
+    });
+    if (res.ok) showToast(`Package "${trimmed}" saved ✓`);
+    else { const e = await res.json().catch(() => ({})); showToast(e.detail || 'Save failed', true); }
+  } catch (e) { showToast('Cannot reach server', true); }
+}
+
+function closePkgMenuOnce(e) {
+  const menu = document.getElementById('pkg-menu');
+  if (menu && !menu.contains(e.target)) {
+    menu.style.display = 'none';
+    document.removeEventListener('click', closePkgMenuOnce);
+  }
+}
+
+async function showPkgMenu(anchorEl, title, kind, onPick) {
+  let menu = document.getElementById('pkg-menu');
+  if (!menu) {
+    menu = document.createElement('div');
+    menu.id = 'pkg-menu';
+    menu.className = 'pkg-menu';
+    document.body.appendChild(menu);
+  }
+  menu.innerHTML = '<div class="pkg-empty">Loading…</div>';
+  const rect = anchorEl.getBoundingClientRect();
+  menu.style.top  = (rect.bottom + window.scrollY + 4) + 'px';
+  menu.style.left = (rect.left   + window.scrollX) + 'px';
+  menu.style.display = 'block';
+  setTimeout(() => document.addEventListener('click', closePkgMenuOnce), 0);
+  let list = [];
+  try {
+    const res = await fetch('/packages?kind=' + kind);
+    if (res.ok) list = await res.json();
+  } catch (e) {}
+  renderPkgMenu(menu, title, list, kind, onPick);
+}
+
+function renderPkgMenu(menu, title, list, kind, onPick) {
+  const isViewer = !!window.__viewer;
+  const noun = kind === 'group' ? 'bundles' : 'packages';
+  if (!list.length) {
+    menu.innerHTML = `<div class="pkg-menu-title">${esc(title)}</div><div class="pkg-empty">No saved ${noun} yet.</div>`;
+    return;
+  }
+  const countOf = p => kind === 'group'
+    ? (p.data?.items?.length || 0)
+    : (p.data?.sections?.reduce((n, s) => n + (s.groups?.reduce((m, g) => m + (g.items?.length || 0), 0) || 0), 0) || 0);
+  menu.innerHTML = `<div class="pkg-menu-title">${esc(title)}</div>` + list.map(p => `
+    <div class="pkg-row" data-id="${p.id}">
+      <span class="pkg-name">${esc(p.name)}</span>
+      <span class="pkg-meta">${countOf(p)} items</span>
+      ${isViewer ? '' : `<button class="pkg-del" data-del="${p.id}" title="Delete">🗑</button>`}
+    </div>`).join('');
+  menu.querySelectorAll('.pkg-row').forEach(row => {
+    row.addEventListener('click', e => {
+      if (e.target.closest('.pkg-del')) return;
+      const p = list.find(x => x.id == row.dataset.id);
+      menu.style.display = 'none';
+      document.removeEventListener('click', closePkgMenuOnce);
+      onPick(p);
+    });
+  });
+  menu.querySelectorAll('.pkg-del').forEach(btn => {
+    btn.addEventListener('click', async e => {
+      e.stopPropagation();
+      const id = btn.dataset.del;
+      const p = list.find(x => x.id == id);
+      if (!confirm(`Delete saved ${kind === 'group' ? 'bundle' : 'package'} "${p.name}"?`)) return;
+      try {
+        const res = await fetch('/packages/' + id, { method: 'DELETE' });
+        if (res.ok || res.status === 204) {
+          const idx = list.findIndex(x => x.id == id);
+          if (idx >= 0) list.splice(idx, 1);
+          renderPkgMenu(menu, title, list, kind, onPick);
+          showToast('Deleted ✓');
+        } else showToast('Delete failed', true);
+      } catch (err) { showToast('Cannot reach server', true); }
+    });
+  });
+}
+
+function openPackagesMenu(e) {
+  e?.stopPropagation();
+  showPkgMenu(e.currentTarget, 'Load a saved quotation package', 'quote', p => {
+    if (!p) return;
+    if (!confirm(`Load package "${p.name}"?\n\nThis replaces the current sections, items, terms and discount. Client details are kept.`)) return;
+    applyQuoteData(p.data || {});
+    showToast(`Loaded "${p.name}" ✓`);
+  });
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+function fmt(n) { return Number(n || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function showToast(msg, err = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast' + (err ? ' error' : ''); t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2800);
+}
+
+init();
+</script>
+<script>
+(async()=>{
+  try{
+    const me=await fetch('/me').then(r=>r.json());
+    window.__viewer=me.role==='viewer';
+    if(window.__viewer){
+      document.querySelectorAll('.viewer-hide').forEach(el=>el.style.display='none');
+      const sp=document.querySelector('nav .spacer');
+      if(sp){const b=document.createElement('span');b.textContent='View Only';b.style.cssText='background:#fef3c7;color:#b45309;font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;white-space:nowrap';sp.after(b);}
+    }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Melvin Gan Carpentry — Quotation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@200&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f6fa; color: #1a1a2e; }
+  nav { background: #f0ebe1; padding: 16px 32px; display: flex; align-items: center; gap: 24px; }
+  .nav-logo { font-family: 'Raleway', sans-serif; font-weight: 200; font-size: 19px; letter-spacing: 4px; color: #1a1a2e; white-space: nowrap; flex-shrink: 0; text-decoration: none; }
+  nav a { color: #7a6352; text-decoration: none; font-size: 14px; }
+  nav a:hover { color: #1a1a2e; }
+  nav .spacer { flex: 1; }
+  nav button.logout { background: none; border: 1px solid #c9b9a5; color: #7a6352; padding: 4px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+  .main { padding: 32px; max-width: 900px; margin: 0 auto; }
+  .back { font-size: 13px; color: #4a3b30; text-decoration: none; display: inline-block; margin-bottom: 20px; }
+  .header-row { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; }
+  .header-row h2 { font-size: 22px; font-weight: 800; }
+  .badge { display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .badge-draft{background:#f3f4f6;color:#374151}
+  .badge-sent{background:#dbeafe;color:#1d4ed8}
+  .badge-negotiating{background:#ffedd5;color:#c2410c}
+  .badge-accepted{background:#d1fae5;color:#065f46}
+  .badge-rejected{background:#fee2e2;color:#991b1b}
+  .badge-locked{background:#f0ebe1;color:#4a3b30}
+  .doc-tabs { display: flex; gap: 6px; margin-bottom: 18px; border-bottom: 2px solid #eee; }
+  .doc-tab { padding: 9px 20px; font-size: 14px; font-weight: 700; color: #999; cursor: pointer; border: none; background: none; font-family: inherit; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+  .doc-tab:hover { color: #4a3b30; }
+  .doc-tab.active { color: #4a3b30; border-bottom-color: #4a3b30; }
+  .pf-inp { padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; font-family: inherit; width: 100%; }
+  .pf-inp:focus { outline: none; border-color: #8a7364; }
+  .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,.06); margin-bottom: 20px; }
+  .card h3 { font-size: 13px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 14px; }
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .kv { display: flex; flex-direction: column; }
+  .kv .lbl { font-size: 11px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 2px; }
+  .kv .val { font-size: 14px; color: #1a1a2e; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { background: #1a1a2e; color: white; padding: 9px 12px; text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+  thead th.r { text-align: right; }
+  td { padding: 8px 12px; border-bottom: 1px solid #f0f0f5; }
+  tr:last-child td { border-bottom: none; }
+  .cat-header td { background: #f0ebe1; color: #7a6352; font-weight: 700; font-size: 12px; padding: 5px 12px; }
+  .grp-header td { background: #faf7f2; color: #8a7364; font-weight: 600; font-size: 11.5px; padding: 4px 12px 4px 24px; letter-spacing: .2px; }
+  .totals-section { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; padding-top: 12px; border-top: 2px solid #f0f0f5; }
+  .tot-row { display: flex; gap: 16px; font-size: 13px; }
+  .tot-row .l { color: #666; min-width: 120px; text-align: right; }
+  .tot-row .v { min-width: 100px; text-align: right; font-weight: 600; }
+  .tot-total { background: #1a1a2e; color: white; padding: 9px 14px; border-radius: 8px; display: flex; gap: 16px; font-size: 15px; font-weight: 800; margin-top: 4px; }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  button.primary { background: #4a3b30; color: white; border: none; padding: 9px 18px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
+  button.primary:hover { background: #33291f; }
+  button.secondary { background: white; color: #444; border: 1px solid #ddd; padding: 9px 18px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+  button.danger { background: white; color: #ef4444; border: 1px solid #fca5a5; padding: 9px 18px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+  button.green { background: #10b981; color: white; border: none; padding: 9px 18px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
+  select.inline { padding: 7px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; background: white; }
+  .locked-notice { background: #f0ebe1; border-left: 4px solid #4a3b30; padding: 10px 16px; border-radius: 8px; font-size: 13px; color: #4a3b30; font-weight: 600; margin-bottom: 16px; }
+  .invoice-box { background: #d1fae5; border-left: 4px solid #10b981; padding: 14px 16px; border-radius: 8px; font-size: 13px; }
+  .invoice-box strong { color: #065f46; }
+  .payment-row { display: flex; gap: 10px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+  .payment-badge-unpaid{background:#fee2e2;color:#991b1b;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+  .payment-badge-partial{background:#fef3c7;color:#b45309;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+  .payment-badge-paid{background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #10b981; color: white; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; display: none; z-index: 300; }
+  .toast.error { background: #ef4444; }
+
+  @media(max-width:640px){
+    nav { padding: 8px 14px; gap: 8px; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+    nav::-webkit-scrollbar { display: none; }
+    .nav-logo { font-size: 15px; letter-spacing: 3px; }
+    nav a { font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+    nav .spacer { display: none; }
+    nav button.logout { white-space: nowrap; flex-shrink: 0; font-size: 11px; padding: 4px 8px; }
+    .main { padding: 12px; }
+    .card { padding: 16px 12px; }
+    .header-row h2 { font-size: 18px; }
+    .info-grid { grid-template-columns: 1fr; }
+    /* Hide UOM column (col 2) on mobile */
+    table thead th:nth-child(2), table tbody td:nth-child(2) { display: none; }
+    table thead th:first-child { width: 50%; }
+    table thead th:nth-child(3) { width: 12%; }
+    table thead th:nth-child(4) { width: 20%; }
+    table thead th:nth-child(5) { width: 16%; }
+    td { padding: 7px 8px; font-size: 12px; }
+    .totals-section { align-items: stretch; }
+    .tot-row { justify-content: space-between; }
+    .tot-row .l { min-width: 0; flex: 1; }
+    .tot-row .v { min-width: 0; }
+    .tot-total { font-size: 13px; justify-content: space-between; }
+    .actions button { font-size: 12px; padding: 8px 12px; }
+    #status-row { flex-wrap: wrap; }
+    .payment-row { flex-wrap: wrap; gap: 8px; }
+    .invoice-box button.green { width: 100%; margin-top: 4px; }
+  }
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">melvin gan carpentry</a>
+  <a href="/">Dashboard</a>
+  <a href="/leads-page">All Leads</a>
+  <a href="/quotes-page">Quotations</a>
+  <a href="/checklists-page">Checklists</a>
+  <a href="/admin/presets">Library</a>
+  <div class="spacer"></div>
+  <form method="POST" action="/logout" style="margin:0"><button class="logout" type="submit">Sign out</button></form>
+</nav>
+
+<div class="main">
+  <a id="back-link" href="/leads-page" class="back">← Back</a>
+
+  <div class="header-row">
+    <h2 id="qt-number">—</h2>
+    <span id="qt-badge" class="badge"></span>
+    <span id="locked-badge" style="display:none" class="badge badge-locked">🔒 Converted to Proforma Invoice</span>
+  </div>
+
+  <div class="doc-tabs">
+    <button class="doc-tab active" id="tab-quotation" onclick="showDocTab('quotation')">Quotation</button>
+    <button class="doc-tab" id="tab-proforma" onclick="showDocTab('proforma')">Proforma Invoice</button>
+  </div>
+
+  <div id="locked-notice" class="locked-notice" style="display:none">
+    This quotation has been converted to a proforma invoice and is locked from editing.
+  </div>
+
+  <div id="invoice-box" class="card" style="display:none">
+    <h3>Proforma Invoice</h3>
+    <div class="invoice-box">
+      <strong id="inv-number">—</strong>
+      <div class="payment-row">
+        <span>Payment Status:</span>
+        <span id="inv-pay-badge" class="payment-badge-unpaid">Unpaid</span>
+        <select class="inline viewer-hide" id="inv-pay-select" onchange="updatePayment()">
+          <option value="unpaid">Unpaid</option>
+          <option value="partial">Partial</option>
+          <option value="paid">Fully Paid</option>
+        </select>
+        <button class="green" onclick="downloadInvoicePDF()">⬇ Proforma Invoice PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Client & Project</h3>
+    <div class="info-grid">
+      <div class="kv"><span class="lbl">Client</span><span class="val" id="d-client">—</span></div>
+      <div class="kv"><span class="lbl">Phone</span><span class="val" id="d-phone">—</span></div>
+      <div class="kv"><span class="lbl">Project Address</span><span class="val" id="d-addr">—</span></div>
+      <div class="kv"><span class="lbl">Project Type</span><span class="val" id="d-type">—</span></div>
+      <div class="kv"><span class="lbl">Size</span><span class="val" id="d-size">—</span></div>
+      <div class="kv"><span class="lbl">Design Theme</span><span class="val" id="d-theme">—</span></div>
+      <div class="kv"><span class="lbl">Condo Name</span><span class="val" id="d-condo">—</span></div>
+      <div class="kv"><span class="lbl">Valid Until</span><span class="val" id="d-valid">—</span></div>
+      <div class="kv"><span class="lbl">Created By</span><span class="val" id="d-by">—</span></div>
+    </div>
+  </div>
+
+  <div class="card proforma-only" id="proforma-fields" style="display:none">
+    <h3>Proforma Invoice Details</h3>
+    <div class="info-grid">
+      <div class="kv"><span class="lbl">IC Number</span>
+        <input id="f-ic" class="pf-inp" placeholder="e.g. 900101-14-5678"></div>
+      <div class="kv"><span class="lbl">Customer Address</span>
+        <input id="f-custaddr" class="pf-inp" placeholder="Billing address"></div>
+    </div>
+    <div style="margin-top:12px;display:flex;align-items:center;gap:10px">
+      <button class="secondary viewer-hide" id="btn-pf-save" onclick="saveProformaFields()">Save details</button>
+      <span id="pf-save-note" style="font-size:12px;color:#888"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Line Items</h3>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:40%">Description</th>
+          <th style="width:10%">UOM</th>
+          <th class="r" style="width:10%">Qty</th>
+          <th class="r" style="width:18%">Unit Price</th>
+          <th class="r" style="width:18%">Amount</th>
+        </tr>
+      </thead>
+      <tbody id="items-tbody"></tbody>
+    </table>
+    <div class="totals-section">
+      <div class="tot-row"><span class="l">Subtotal:</span><span class="v" id="t-sub">—</span></div>
+      <div class="tot-row"><span class="l" id="t-sst-lbl">SST (6%):</span><span class="v" id="t-sst">—</span></div>
+      <div class="tot-total"><span style="min-width:120px;text-align:right">TOTAL</span><span id="t-total" style="min-width:100px;text-align:right">—</span></div>
+    </div>
+  </div>
+
+  <div id="terms-card" class="card" style="display:none">
+    <h3>Terms & Notes</h3>
+    <p id="d-terms" style="font-size:13px;color:#555;white-space:pre-wrap"></p>
+  </div>
+
+  <div class="actions" id="action-bar">
+    <button class="primary quotation-only" onclick="downloadPDF()">⬇ Download PDF</button>
+    <button class="primary proforma-only" style="display:none" onclick="downloadProformaPDF()">⬇ Download Proforma Invoice</button>
+    <label style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#555;cursor:pointer;user-select:none">
+      <input type="checkbox" id="chk-hide-price" style="accent-color:#4a3b30"> Hide unit price (client copy)
+    </label>
+    <label class="proforma-only" style="display:none;align-items:center;gap:6px;font-size:13px;color:#555;cursor:pointer;user-select:none">
+      <input type="checkbox" id="chk-show-contact" style="accent-color:#4a3b30"> Include IC &amp; Customer Address
+    </label>
+    <button class="secondary viewer-hide" id="btn-edit" onclick="editQuote()">✏ Edit</button>
+    <button class="green viewer-hide" id="btn-convert" onclick="convertToInvoice()">→ Convert to Proforma Invoice</button>
+    <button class="secondary viewer-hide" id="btn-unlock" onclick="unlockQuote()" style="display:none">🔓 Unlock to Edit</button>
+    <button class="viewer-hide" id="btn-delete" onclick="deleteQuote()"
+            style="background:none;color:#ef4444;border:1px solid #fecaca;padding:11px 22px;border-radius:8px;font-size:14px;cursor:pointer;font-weight:600">
+      ✕ Delete
+    </button>
+  </div>
+
+  <div id="status-row" style="margin-top:12px;display:flex;gap:10px;align-items:center">
+    <span style="font-size:13px;color:#666">Status:</span>
+    <select class="inline viewer-hide" id="status-select" onchange="updateStatus()">
+      <option value="draft">Draft</option>
+      <option value="sent">Sent to Client</option>
+      <option value="negotiating">Negotiating</option>
+      <option value="accepted">Accepted</option>
+      <option value="rejected">Rejected</option>
+    </select>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CAT_LABELS = {design:"Design Fee", construction:"Construction / Material", misc:"Miscellaneous"};
+const STATUS_LABELS = {draft:"Draft",sent:"Sent",negotiating:"Negotiating",accepted:"Accepted",rejected:"Rejected"};
+const quoteId = parseInt(window.location.pathname.split("/").pop());
+let quoteData = null;
+let invoiceData = null;
+
+async function load() {
+  quoteData = await fetch("/quotes/" + quoteId).then(r => r.json());
+  const q = quoteData;
+
+  document.getElementById("qt-number").textContent = q.quote_number;
+  const badge = document.getElementById("qt-badge");
+  badge.textContent = STATUS_LABELS[q.status] || q.status;
+  badge.className = "badge badge-" + q.status;
+
+  if (q.is_locked) {
+    document.getElementById("locked-badge").style.display = "inline-block";
+    document.getElementById("locked-notice").style.display = "block";
+    document.getElementById("btn-edit").style.display = "none";
+    document.getElementById("btn-convert").style.display = "none";
+    document.getElementById("btn-unlock").style.display = "inline-block";
+    document.getElementById("status-row").style.display = "none";
+  }
+
+  if (q.lead_id) document.getElementById("back-link").href = "/lead/" + q.lead_id;
+
+  document.getElementById("d-client").textContent = q.client_name || "—";
+  document.getElementById("d-phone").textContent = q.client_phone || "—";
+  document.getElementById("d-addr").textContent = q.project_address || "—";
+  document.getElementById("d-type").textContent = q.project_type ? q.project_type.charAt(0).toUpperCase() + q.project_type.slice(1) : "—";
+  document.getElementById("d-size").textContent = q.size_range || "—";
+  document.getElementById("d-theme").textContent = q.design_theme || "—";
+  document.getElementById("d-condo").textContent = q.condo_name || "—";
+  document.getElementById("d-valid").textContent = q.valid_until || "—";
+  document.getElementById("d-by").textContent = q.created_by || "—";
+
+  document.getElementById("f-ic").value = q.ic_number || "";
+  document.getElementById("f-custaddr").value = q.customer_address || "";
+  if (q.is_locked) {
+    document.getElementById("f-ic").readOnly = true;
+    document.getElementById("f-custaddr").readOnly = true;
+    document.getElementById("btn-pf-save").style.display = "none";
+  }
+
+  if (q.terms_notes) {
+    document.getElementById("terms-card").style.display = "block";
+    document.getElementById("d-terms").textContent = q.terms_notes;
+  }
+
+  document.getElementById("status-select").value = q.status;
+
+  // Items grouped by category
+  const cats = {};
+  (q.items || []).forEach(item => {
+    cats[item.category] = cats[item.category] || [];
+    cats[item.category].push(item);
+  });
+  const tbody = document.getElementById("items-tbody");
+  tbody.innerHTML = "";
+  Object.entries(cats).forEach(([cat, catItems]) => {
+    const hrow = tbody.insertRow();
+    hrow.className = "cat-header";
+    hrow.innerHTML = `<td colspan="5">${CAT_LABELS[cat] || cat}</td>`;
+    let lastGroup = null;
+    catItems.forEach(item => {
+      const grp = (item.group_name || "").trim();
+      if (grp && grp !== lastGroup) {
+        const grow = tbody.insertRow();
+        grow.className = "grp-header";
+        grow.innerHTML = `<td colspan="5">${esc(grp)}</td>`;
+      }
+      lastGroup = grp;
+      const row = tbody.insertRow();
+      row.innerHTML = `
+        <td>${esc(item.description)}${item.details ? `<div style="font-size:11px;color:#8a7364;font-style:italic;margin-top:2px;white-space:pre-wrap">${esc(item.details)}</div>` : ''}</td>
+        <td>${esc(item.uom||"")}</td>
+        <td style="text-align:right">${item.qty % 1 === 0 ? item.qty : item.qty.toFixed(1)}</td>
+        <td style="text-align:right">RM ${fmt(item.unit_price)}</td>
+        <td style="text-align:right;font-weight:600">RM ${fmt(item.subtotal)}</td>`;
+    });
+  });
+
+  document.getElementById("t-sub").textContent = "RM " + fmt(q.subtotal);
+  document.getElementById("t-sst-lbl").textContent = `SST (${Math.round(q.sst_rate*100)}%):`;
+  document.getElementById("t-sst").textContent = "RM " + fmt(q.sst_amount);
+  document.getElementById("t-total").textContent = "RM " + fmt(q.total);
+
+  // Load invoice if locked
+  if (q.is_locked) {
+    try {
+      const invCheck = await fetch("/quotes/invoice/by-quote/" + quoteId);
+      if (invCheck.ok) {
+        invoiceData = await invCheck.json();
+        showInvoiceBox();
+      }
+    } catch(e) {}
+  }
+
+  showDocTab(currentDocTab);
+}
+
+// ── Document tabs: Quotation | Proforma Invoice ────────────────────────────────
+let currentDocTab = 'quotation';
+function showDocTab(tab) {
+  currentDocTab = tab;
+  const proforma = tab === 'proforma';
+  document.getElementById('tab-quotation').classList.toggle('active', !proforma);
+  document.getElementById('tab-proforma').classList.toggle('active', proforma);
+  document.querySelectorAll('.quotation-only').forEach(el => el.style.display = proforma ? 'none' : '');
+  document.querySelectorAll('.proforma-only').forEach(el => el.style.display = proforma ? '' : 'none');
+  // Payment box only shows on the Proforma tab and only once converted
+  document.getElementById('invoice-box').style.display = (proforma && invoiceData) ? 'block' : 'none';
+}
+
+function showInvoiceBox() {
+  if (!invoiceData) return;
+  document.getElementById("inv-number").textContent = invoiceData.invoice_number;
+  document.getElementById("inv-pay-select").value = invoiceData.payment_status;
+  document.getElementById("inv-pay-badge").textContent =
+    {unpaid:"Unpaid",partial:"Partial",paid:"Fully Paid"}[invoiceData.payment_status];
+  document.getElementById("inv-pay-badge").className = "payment-badge-" + invoiceData.payment_status;
+}
+
+async function updateStatus() {
+  const status = document.getElementById("status-select").value;
+  const res = await fetch("/quotes/" + quoteId, {
+    method: "PATCH", headers: {"Content-Type":"application/json"}, body: JSON.stringify({status}),
+  });
+  if (res.ok) showToast("Status updated ✓");
+  else showToast("Error", true);
+}
+
+function hidePriceQS() {
+  return document.getElementById('chk-hide-price')?.checked ? '?hide_unit_price=1' : '';
+}
+function downloadPDF() {
+  window.open("/quotes/" + quoteId + "/pdf" + hidePriceQS(), "_blank");
+}
+
+function downloadInvoicePDF() {
+  if (!invoiceData) return;
+  window.open("/quotes/invoice/" + invoiceData.id + "/pdf" + hidePriceQS(), "_blank");
+}
+
+function downloadProformaPDF() {
+  const p = new URLSearchParams({ proforma: '1' });
+  if (document.getElementById('chk-hide-price')?.checked) p.set('hide_unit_price', '1');
+  if (document.getElementById('chk-show-contact')?.checked) p.set('show_contact', '1');
+  window.open('/quotes/' + quoteId + '/pdf?' + p.toString(), '_blank');
+}
+
+async function saveProformaFields() {
+  const note = document.getElementById('pf-save-note');
+  const body = {
+    ic_number: document.getElementById('f-ic').value.trim() || null,
+    customer_address: document.getElementById('f-custaddr').value.trim() || null,
+  };
+  const res = await fetch('/quotes/' + quoteId, {
+    method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+  });
+  if (res.ok) {
+    quoteData.ic_number = body.ic_number;
+    quoteData.customer_address = body.customer_address;
+    note.textContent = 'Saved ✓'; note.style.color = '#10b981';
+    showToast('Proforma details saved ✓');
+  } else {
+    let msg = 'Save failed';
+    try { const e = await res.json(); msg = e.detail || msg; } catch (e) {}
+    note.textContent = msg; note.style.color = '#ef4444';
+    showToast(msg, true);
+  }
+  setTimeout(() => { note.textContent = ''; }, 2800);
+}
+
+function editQuote() {
+  if (quoteData.lead_id) {
+    window.location.href = "/quote-edit/" + quoteId;
+  } else {
+    window.location.href = "/quote-edit/" + quoteId;
+  }
+}
+
+async function deleteQuote() {
+  const num = quoteData?.quote_number || 'this quotation';
+  if (!confirm(`Delete quotation ${num}?\n\nThis cannot be undone. If it has been converted to a proforma invoice, delete that first.`)) return;
+  const res = await fetch('/quotes/' + quoteId, { method: 'DELETE' });
+  if (res.ok) {
+    showToast('Quotation deleted ✓');
+    setTimeout(() => window.location.href = '/quotes-page', 800);
+  } else {
+    let msg = 'Delete failed';
+    try { const e = await res.json(); msg = e.detail || msg; } catch (e) {}
+    showToast(msg, true);
+  }
+}
+
+async function unlockQuote() {
+  if (!confirm("Unlock this quotation for editing?\n\nThis reverts the proforma invoice conversion — the proforma invoice record and its payment status will be removed — so you can furnish the details again.")) return;
+  const res = await fetch("/quotes/" + quoteId + "/unlock", { method: "POST" });
+  if (res.ok) {
+    showToast("Unlocked — you can edit now ✓");
+    setTimeout(() => window.location.reload(), 800);
+  } else {
+    let msg = "Unlock failed";
+    try { const e = await res.json(); msg = e.detail || msg; } catch (e) {}
+    showToast(msg, true);
+  }
+}
+
+async function convertToInvoice() {
+  if (!confirm("Convert this quotation to a proforma invoice? This action locks the quote from editing.")) return;
+  const res = await fetch("/quotes/" + quoteId + "/convert-to-invoice", { method: "POST" });
+  if (res.ok) {
+    invoiceData = await res.json();
+    showToast("Proforma Invoice " + invoiceData.invoice_number + " created ✓");
+    setTimeout(async () => { await load(); showDocTab('proforma'); }, 1000);
+  } else {
+    const e = await res.json();
+    showToast(e.detail || "Error", true);
+  }
+}
+
+async function updatePayment() {
+  if (!invoiceData) return;
+  const status = document.getElementById("inv-pay-select").value;
+  const res = await fetch("/quotes/invoice/" + invoiceData.id + "/payment", {
+    method: "PATCH", headers: {"Content-Type":"application/json"}, body: JSON.stringify({payment_status: status}),
+  });
+  if (res.ok) {
+    invoiceData.payment_status = status;
+    showInvoiceBox();
+    showToast("Payment status updated ✓");
+  }
+}
+
+function fmt(n) { return Number(n||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,","); }
+function esc(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function showToast(msg, err=false) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.className = "toast"+(err?" error":""); t.style.display = "block";
+  setTimeout(()=>{ t.style.display="none"; }, 2800);
+}
+
+load();
+</script>
+<script>
+(async()=>{
+  try{
+    const me=await fetch('/me').then(r=>r.json());
+    window.__viewer=me.role==='viewer';
+    if(window.__viewer){
+      document.querySelectorAll('.viewer-hide').forEach(el=>el.style.display='none');
+      const sp=document.querySelector('nav .spacer');
+      if(sp){const b=document.createElement('span');b.textContent='View Only';b.style.cssText='background:#fef3c7;color:#b45309;font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;white-space:nowrap';sp.after(b);}
+    }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
