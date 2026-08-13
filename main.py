@@ -190,6 +190,19 @@ async def lifespan(app: FastAPI):
             _db.close()
     except Exception as e:
         print(f"Package seed skipped: {e}")
+    # One-time seed: migrate historical quotation QT2026-1838 (client Vijay)
+    try:
+        from database import SessionLocal
+        from services.seed_vijay_quote import seed_once
+        _db = SessionLocal()
+        try:
+            n = seed_once(_db)
+            if n:
+                print(f"Seeded historical quote QT2026-1838 with {n} line items")
+        finally:
+            _db.close()
+    except Exception as e:
+        print(f"Vijay quote seed skipped: {e}")
     yield
 
 
