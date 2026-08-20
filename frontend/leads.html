@@ -302,7 +302,7 @@ button.secondary { background: white; color: #444; border: 1px solid #ddd; paddi
           <option value="office">Office</option>
         </select>
       </div>
-      <div class="fg"></div>
+      <div class="fg"><label>Location / Property</label><input id="f-location" type="text" placeholder="e.g. Myara Ara Damansara"></div>
     </div>
     <div class="form-row">
       <div class="fg"><label>Initial Stage</label>
@@ -334,9 +334,15 @@ button.secondary { background: white; color: #444; border: 1px solid #ddd; paddi
 <div class="modal-bg" id="appt-modal-bg">
   <div class="modal" style="width:380px">
     <h3>📅 Site Visit Appointment</h3>
-    <div class="fg" style="margin-bottom:18px">
-      <label>Date &amp; Time</label>
-      <input id="appt-input" type="datetime-local" step="1800" style="font-size:15px">
+    <div class="form-row" style="margin-bottom:18px">
+      <div class="fg">
+        <label>Date</label>
+        <input id="appt-date" type="date" style="font-size:15px">
+      </div>
+      <div class="fg">
+        <label>Time</label>
+        <select id="appt-time" style="font-size:15px"></select>
+      </div>
     </div>
     <div class="modal-actions">
       <button class="secondary" style="color:#ef4444;border-color:#fca5a5" onclick="removeAppt()">Remove Date</button>
@@ -697,9 +703,9 @@ async function onDrop(e, status) {
   if (status === 'site_visit') {
     lead.status = status;
     renderBoard();
-    document.getElementById('appt-input').value = '';
+    setApptFields(lead.appointment_at || '');
     document.getElementById('appt-modal-bg').classList.add('open');
-    setTimeout(() => document.getElementById('appt-input').focus(), 50);
+    setTimeout(() => document.getElementById('appt-date').focus(), 50);
     return;
   }
   if (status === 'lost') {
@@ -782,19 +788,44 @@ function cancelWon() {
 
 let pendingApptOnly = null; // leadId when opened via right-click (no status change)
 
+// Fixed 30-minute appointment slots (00:00 → 23:30)
+(function buildApptSlots() {
+  const sel = document.getElementById('appt-time');
+  for (let h = 0; h < 24; h++) {
+    for (const m of ['00', '30']) {
+      const val = String(h).padStart(2, '0') + ':' + m;   // 24h value, e.g. "14:30"
+      const hr12 = ((h % 12) || 12);
+      const label = hr12 + ':' + m + ' ' + (h < 12 ? 'AM' : 'PM'); // display, e.g. "2:30 PM"
+      sel.add(new Option(label, val));
+    }
+  }
+})();
+
+// Load an ISO datetime (or empty) into the date + 30-min time slot fields
+function setApptFields(iso) {
+  document.getElementById('appt-date').value = iso ? iso.slice(0, 10) : '';
+  document.getElementById('appt-time').value = iso ? iso.slice(11, 16) : '09:00';
+}
+
+// Combine the date + time fields back into "YYYY-MM-DDTHH:MM" (or '' if no date)
+function getApptValue() {
+  const d = document.getElementById('appt-date').value;
+  const t = document.getElementById('appt-time').value || '09:00';
+  return d ? (d + 'T' + t) : '';
+}
+
 function ctxSetAppointment() {
   document.getElementById('ctx-menu').classList.remove('open');
   const lead = allLeads.find(l => l.id === ctxLeadId);
   if (!lead) return;
   pendingApptOnly = ctxLeadId;
-  document.getElementById('appt-input').value = lead.appointment_at
-    ? lead.appointment_at.slice(0, 16) : '';
+  setApptFields(lead.appointment_at || '');
   document.getElementById('appt-modal-bg').classList.add('open');
-  setTimeout(() => document.getElementById('appt-input').focus(), 50);
+  setTimeout(() => document.getElementById('appt-date').focus(), 50);
 }
 
 async function confirmAppt() {
-  const val = document.getElementById('appt-input').value;
+  const val = getApptValue();
   document.getElementById('appt-modal-bg').classList.remove('open');
   if (pendingApptOnly) {
     const id = pendingApptOnly;
@@ -932,10 +963,12 @@ function ctxMoveToLost() {
 // ── Add Lead Modal ────────────────────────────────────────────────────────────
 
 function openModal(preStatus) {
-  ['f-name','f-phone','f-budget','f-notes'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('f-source').value = '';
-  document.getElementById('f-area').value = '';
+  ['f-name','f-phone','f-budget','f-notes','f-location'].forEach(id => document.getElementById(id).value = '');
+  // Sensible defaults for a new lead
+  document.getElementById('f-source').value = 'fb_ads';        // Source: FB Ads
+  document.getElementById('f-area').value = 'office';          // Appointment: Office
   document.querySelectorAll('#f-type-wrap input[type=checkbox]').forEach(cb => cb.checked = false);
+  document.getElementById('pm-hmv').checked = true;            // Project type: Home Make Over
   document.getElementById('f-status').value = preStatus || 'new';
   document.getElementById('modal-bg').classList.add('open');
   document.getElementById('f-name').focus();
@@ -958,6 +991,7 @@ async function saveLead() {
     budget:         document.getElementById('f-budget').value.trim() || null,
     source_channel: document.getElementById('f-source').value || null,
     area:           document.getElementById('f-area').value || null,
+    location:       document.getElementById('f-location').value.trim() || null,
     project_type:   Array.from(document.querySelectorAll('#f-type-wrap input:checked')).map(cb=>cb.value).join(',')||null,
     request_notes:  document.getElementById('f-notes').value.trim() || null,
   };
