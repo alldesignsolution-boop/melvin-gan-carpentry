@@ -18,7 +18,7 @@ Only `/api/hq` and `/api/imap` are relayed, with a server-held `HQ_BACKEND_ACCES
 - The backend origin is fixed to the existing private Melvin HQ Site.
 - Bind to `0.0.0.0` and Railway's `PORT` (default 8080).
 
-No data migration or new database is needed. The previous application's volume at `/app/data` is left intact for recovery; this portal never opens it. Original code remains recoverable in Git history. Existing Hoga, Hankidz, mail and hourly services are unchanged.
+No data migration or new database is needed. The previous application's volume at `/app/data` is left intact for recovery; this portal never opens it. Original code remains recoverable in Git history. Existing Hoga and Hankidz business services are unchanged.
 
 ## Development and deployment
 
@@ -27,3 +27,7 @@ Node 22.13+. Run `npm ci`, `npm run build`, `npm test`. Start with `npm start` a
 Push to the existing repository's main branch first. Railway follows that branch automatically. Verify the deployment commit matches the pushed SHA and `/health` succeeds, then verify sign-in and read-only HQ loading. Keep `.env*`, customer exports, databases and node_modules out of Git.
 
 Original Sites UI source used for this port: `3fd1391d01b643cc370a77126ccf3b08cf19cbb4`. Public code contains no account credentials or business records. The repository retains its existing visibility.
+
+## HQ service organization
+
+The Railway project is named Melvin HQ. Its website, hourly sync and private email bridge belong together in production. The two functions have been moved out of the Hoga project. Their deployed source is tracked in `infrastructure/hourly-sync.ts` and `infrastructure/mail-bridge.ts`; the original sync modules also remain in the Sites source repository. Credentials stay in server variables and never enter Git. The mail bridge retains the private endpoint `melvin-hq-mail.railway.internal:3000`. The sync runs at `0 * * * *` and keeps the existing Sites data destination. Hoga keeps its CRM and persistent database in its own project.
