@@ -5,8 +5,9 @@ import { simpleParser } from 'mailparser@3';
 import { timingSafeEqual } from 'node:crypto';
 function authorised(req:Request){const expected=Bun.env.HQ_MAIL_SECRET||'',actual=req.headers.get('x-hq-mail-key')||'';return expected&&actual.length===expected.length&&timingSafeEqual(Buffer.from(expected),Buffer.from(actual));}
 export async function handle(req:Request){
-  if(!authorised(req))return Response.json({error:'Unauthorized'},{status:401});
+  // Railway's private healthcheck carries no mailbox credentials.
   if(req.method==='GET'&&new URL(req.url).pathname==='/health')return Response.json({ok:true});
+  if(!authorised(req))return Response.json({error:'Unauthorized'},{status:401});
   if(req.method!=='POST')return new Response('Method not allowed',{status:405});
   const raw=await req.text();if(raw.length>12000)return new Response('Too large',{status:413});
   let input;try{input=JSON.parse(raw);}catch{return Response.json({error:'Invalid request'},{status:400});}
