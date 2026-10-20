@@ -7,7 +7,7 @@ import {once} from 'node:events';
 import {createPortalServer} from './server.mjs';
 test('Private Railway portal enforces sign-in, origin, session lifetime and restricted server relay',async()=>{
   const root=await mkdtemp(join(tmpdir(),'hq-portal-test-'));await writeFile(join(root,'index.html'),'<h1>HQ fixture</h1>');await writeFile(join(root,'favicon.svg'),'<svg/>');
-  const env={ADMIN_USER:'fixture-user',ADMIN_PASS:'synthetic-password',HQ_SESSION_SECRET:'x'.repeat(48),HQ_PORTAL_SECRET:'y'.repeat(48),HQ_BACKEND_ACCESS_TOKEN:'synthetic-private-site-access',PUBLIC_ORIGIN:'http://127.0.0.1'};
+  const env={ADMIN_USER:'fixture-user',ADMIN_PASS:'synthetic-password',HQ_SESSION_SECRET:'x'.repeat(48),HQ_PORTAL_SECRET:'y'.repeat(48),HQ_BACKEND_ACCESS_TOKEN:'synthetic-private-site-access',PUBLIC_ORIGIN:'http://127.0.0.1',HQ_DATA_DIR:root};
   let clock=Date.now();const calls=[];
   const server=createPortalServer({root,env,now:()=>clock,fetchImpl:async(url,options)=>{calls.push({url,options});return Response.json(options.method==='GET'?{rows:[{kind:'reminder',data:{title:'Test fixture'}}],capabilities:{}}:{ok:true});}});
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const origin=`http://127.0.0.1:${server.address().port}`;

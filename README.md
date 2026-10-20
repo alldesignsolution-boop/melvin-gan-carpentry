@@ -2,7 +2,21 @@
 
 Private overview for Hoga Space, Hankidz, Digital Ads Service and redpacket.my. This replaces the old website in the existing repository while preserving its Git history and Railway volume.
 
-The React interface is hosted on Railway. Existing HQ records remain in the private Sites application's D1 storage; the existing Railway hourly job continues updating that same store. Private reminders and review state are shared between both HQ addresses. Business source dashboards are still read-only sources. The removed Tasks from Melvin feature stays removed.
+The React interface is hosted on Railway. Existing HQ records (brand summaries, mail, review state) remain in the private Sites application's D1 storage; the existing Railway hourly job continues updating that same store. Business source dashboards are still read-only sources. The Follow-ups & reminders page has been removed; saved reminders stay in the Sites store but are no longer shown.
+
+## Pages
+
+- **Today**: new leads, to-dos due this week, latest leads, client shortcuts and brand cards.
+- **Leads**: a Trello-style board (New → Contacted → Qualified → Proposal → Onboarded / Lost). Cards have labels, a to-do checklist, contact buttons, shortcuts, comments and an activity log. Drag cards between lists.
+- **Clients**: every lead in Onboarded gets its own dashboard at `#/clients/<id>` with shortcut tiles (keys 1–9), checklist progress, notes and activity.
+- **Performance**, **Inbox**, **Connections**: unchanged brand data from the Sites store; Connections also shows ManyChat intake status.
+- Press `Ctrl K` (or `/`) anywhere to jump to a page, lead or client.
+
+## Leads store and ManyChat intake
+
+Leads, labels, to-dos and activity are owned by this Railway service in SQLite (`node:sqlite`) at `$RAILWAY_VOLUME_MOUNT_PATH/melvin-crm.sqlite` (override with `HQ_DATA_DIR`; locally `./.data`). It is a new file beside the old application's data, which is left untouched.
+
+ManyChat posts contacts to `POST /api/manychat?brand=<hoga|digitalads|hankidz|redpacket>` using an External Request action with header `X-HQ-Key: <MANYCHAT_WEBHOOK_SECRET>` and body "Add Full Contact Data". Intake is off until `MANYCHAT_WEBHOOK_SECRET` (24+ characters) is set. Contacts are upserted by ManyChat ID, then by phone within the brand; ManyChat tags become labels, `live_chat_url` becomes a shortcut, custom fields are kept on the card, and the last message goes to the activity log. The board API is `/api/crm` (session, same-origin JSON writes only).
 
 ## Authentication and storage
 
@@ -13,12 +27,12 @@ Only `/api/hq` and `/api/imap` are relayed, with a server-held `HQ_BACKEND_ACCES
 ## Runtime configuration
 
 - Existing `ADMIN_USER`, `ADMIN_PASS` are preserved.
-- `HQ_SESSION_SECRET`, `HQ_BACKEND_ACCESS_TOKEN`, `HQ_PORTAL_SECRET` are secret Railway variables.
+- `HQ_SESSION_SECRET`, `HQ_BACKEND_ACCESS_TOKEN`, `HQ_PORTAL_SECRET` and `MANYCHAT_WEBHOOK_SECRET` are secret Railway variables.
 - `PUBLIC_ORIGIN=https://melvin-hq.up.railway.app`.
 - The backend origin is fixed to the existing private Melvin HQ Site.
 - Bind to `0.0.0.0` and Railway's `PORT` (default 8080).
 
-No data migration or new database is needed. The previous application's volume at `/app/data` is left intact for recovery; this portal never opens it. Original code remains recoverable in Git history. Existing Hoga and Hankidz business services are unchanged.
+The previous application's files on the `/app/data` volume are left intact for recovery; the portal only adds `melvin-crm.sqlite` beside them. Original code remains recoverable in Git history. Existing Hoga and Hankidz business services are unchanged.
 
 ## Development and deployment
 
