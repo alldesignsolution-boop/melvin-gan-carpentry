@@ -14,7 +14,7 @@ Only `/api/hq` and `/api/imap` are relayed, with a server-held `HQ_BACKEND_ACCES
 
 - Existing `ADMIN_USER`, `ADMIN_PASS` are preserved.
 - `HQ_SESSION_SECRET`, `HQ_BACKEND_ACCESS_TOKEN`, `HQ_PORTAL_SECRET` are secret Railway variables.
-- `PUBLIC_ORIGIN=https://melvin-gan-carpentry-production.up.railway.app`.
+- `PUBLIC_ORIGIN=https://melvin-hq.up.railway.app`.
 - The backend origin is fixed to the existing private Melvin HQ Site.
 - Bind to `0.0.0.0` and Railway's `PORT` (default 8080).
 
