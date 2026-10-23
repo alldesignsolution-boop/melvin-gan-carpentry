@@ -4,6 +4,7 @@ import {resolve,sep,extname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createHmac,createHash,timingSafeEqual,randomBytes} from 'node:crypto';
 import {openCrm} from './lib/crm.mjs';
+import {openAds} from './lib/ads-store.mjs';
 
 const backendOrigin='https://melvin-hq.melvingan.chatgpt.site';
 const cookieName='melvin_hq_session';
@@ -15,13 +16,15 @@ const loginPage=(message='')=>`<!doctype html><html lang="en"><meta charset="utf
 
 async function readBody(req,limit){let size=0;const chunks=[];for await(const chunk of req){size+=chunk.length;if(size>limit)throw Object.assign(new Error('Request too large.'),{status:413});chunks.push(chunk);}return Buffer.concat(chunks);}
 
-export function createPortalServer({env=process.env,fetchImpl=fetch,root=fileURLToPath(new URL('./dist/',import.meta.url)),now=()=>Date.now(),crm}={}){
+export function createPortalServer({env=process.env,fetchImpl=fetch,root=fileURLToPath(new URL('./dist/',import.meta.url)),now=()=>Date.now(),crm,ads}={}){
   const {ADMIN_USER,ADMIN_PASS,HQ_SESSION_SECRET,HQ_BACKEND_ACCESS_TOKEN,HQ_PORTAL_SECRET,PUBLIC_ORIGIN}=env;
   if(!ADMIN_USER||!ADMIN_PASS||!HQ_SESSION_SECRET||HQ_SESSION_SECRET.length<32||!HQ_BACKEND_ACCESS_TOKEN||!HQ_PORTAL_SECRET||HQ_PORTAL_SECRET.length<32)throw new Error('Private portal settings are incomplete.');
   if(!PUBLIC_ORIGIN||new URL(PUBLIC_ORIGIN).origin!==PUBLIC_ORIGIN)throw new Error('Configure the exact public origin.');
   const secure=PUBLIC_ORIGIN.startsWith('https://'),sign=value=>createHmac('sha256',HQ_SESSION_SECRET).update(value).digest('base64url');
   const attempts=new Map(),hookFailures=new Map(),hookSecret=env.MANYCHAT_WEBHOOK_SECRET&&env.MANYCHAT_WEBHOOK_SECRET.length>=24?env.MANYCHAT_WEBHOOK_SECRET:'';
-  const ownCrm=!crm;crm??=openCrm({dir:env.HQ_DATA_DIR||env.RAILWAY_VOLUME_MOUNT_PATH||fileURLToPath(new URL('./.data/',import.meta.url))});
+  const dataDir=env.HQ_DATA_DIR||env.RAILWAY_VOLUME_MOUNT_PATH||fileURLToPath(new URL('./.data/',import.meta.url));
+  const ownCrm=!crm;crm??=openCrm({dir:dataDir});
+  const ownAds=!ads;ads??=openAds({dir:dataDir});
   function authenticated(req){const raw=req.headers.cookie?.split(';').map(x=>x.trim()).find(x=>x.startsWith(cookieName+'='))?.slice(cookieName.length+1)||'';const [expires,nonce,signature,...rest]=raw.split('.');return !rest.length&&/^\d{13}$/.test(expires||'')&&Number(expires)>now()&&Number(expires)<=now()+8*3600000&&/^[a-f0-9]{32}$/.test(nonce||'')&&!!signature&&equal(signature,sign(expires+'.'+nonce));}
   const server=createServer(async(req,res)=>{
     const send=(status,body,extra={})=>{res.writeHead(status,{...baseHeaders,...extra});res.end(req.method==='HEAD'?undefined:body);};
@@ -66,6 +69,14 @@ export function createPortalServer({env=process.env,fetchImpl=fetch,root=fileURL
         let payload;try{payload=JSON.parse((await readBody(req,50000)).toString());}catch(e){if(e.status)throw e;return json(400,{error:'Invalid JSON.'});}
         const {result}=crm.act(payload);return json(200,{...crm.state(),webhook,result});
       }
+      if(path==='/api/ads'){
+        if(req.method==='GET')return json(200,ads.state({brand:url.searchParams.get('brand')||'all',from:url.searchParams.get('from')||'',to:url.searchParams.get('to')||''}));
+        if(req.method!=='POST')return json(405,{error:'Method not allowed.'},{Allow:'GET, POST'});
+        if(req.headers.origin!==PUBLIC_ORIGIN)return json(403,{error:'Please make changes from Melvin HQ.'});
+        if(!req.headers['content-type']?.startsWith('application/json'))return json(415,{error:'JSON required.'});
+        let payload;try{payload=JSON.parse((await readBody(req,4000000)).toString());}catch(e){if(e.status)throw e;return json(400,{error:'Invalid JSON.'});}
+        return json(200,ads.act(payload));
+      }
       if(allowedApis.has(path)){
         if(!allowedApis.get(path).has(req.method))return json(405,{error:'Method not allowed.'});
         let body;
@@ -91,6 +102,7 @@ export function createPortalServer({env=process.env,fetchImpl=fetch,root=fileURL
     }catch(error){if(error.expose)return json(error.status,{error:error.message});return json(error.status||(['ENOENT','ENOTDIR'].includes(error.code)?404:502),{error:error.status===413?'Request too large.':error.code==='ENOENT'?'Not found.':'Unable to complete this request. Please retry.'});}
   });
   if(ownCrm)server.on('close',()=>crm.close());
+  if(ownAds)server.on('close',()=>ads.close());
   return server;
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){

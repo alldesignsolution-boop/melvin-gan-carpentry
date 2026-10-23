@@ -9,7 +9,8 @@ The React interface is hosted on Railway. Existing HQ records (brand summaries, 
 - **Today**: new leads, to-dos due this week, latest leads, client shortcuts and brand cards.
 - **Leads**: a Trello-style board (New → Contacted → Qualified → Proposal → Onboarded / Lost). Cards have labels, a to-do checklist, contact buttons, shortcuts, comments and an activity log. Drag cards between lists.
 - **Clients**: every lead in Onboarded gets its own dashboard at `#/clients/<id>` with shortcut tiles (keys 1–9), checklist progress, notes and activity.
-- **Performance**, **Inbox**, **Connections**: unchanged brand data from the Sites store; Connections also shows ManyChat intake status.
+- **Performance**: an ad-performance dashboard (see below), followed by the brand pipeline data from the Sites store.
+- **Inbox**, **Connections**: unchanged brand data from the Sites store; Connections also shows ManyChat intake status.
 - Press `Ctrl K` (or `/`) anywhere to jump to a page, lead or client.
 
 ## Leads store and ManyChat intake
@@ -17,6 +18,12 @@ The React interface is hosted on Railway. Existing HQ records (brand summaries, 
 Leads, labels, to-dos and activity are owned by this Railway service in SQLite (`node:sqlite`) at `$RAILWAY_VOLUME_MOUNT_PATH/melvin-crm.sqlite` (override with `HQ_DATA_DIR`; locally `./.data`). It is a new file beside the old application's data, which is left untouched.
 
 ManyChat posts contacts to `POST /api/manychat?brand=<hoga|digitalads|hankidz|redpacket>` using an External Request action with header `X-HQ-Key: <MANYCHAT_WEBHOOK_SECRET>` and body "Add Full Contact Data". Intake is off until `MANYCHAT_WEBHOOK_SECRET` (24+ characters) is set. Contacts are upserted by ManyChat ID, then by phone within the brand; ManyChat tags become labels, `live_chat_url` becomes a shortcut, custom fields are kept on the card, and the last message goes to the activity log. The board API is `/api/crm` (session, same-origin JSON writes only).
+
+## Ad performance
+
+Import CSV exports from Meta Ads Manager, Google Ads or TikTok (or type numbers in) per brand. Columns are matched by name (`lib/ads-metrics.mjs`); a column missing from an export is stored as missing, so ratios only use rows that report it. Re-importing an overlapping period replaces matching rows (brand, platform, dates, campaign, ad set, ad). Rows, imports and per-brand targets live in `melvin-ads.sqlite` beside the CRM file; the API is `/api/ads` (session, same-origin JSON writes only).
+
+The dashboard computes delivery, creative (hook/hold/completion), click & landing, conversion, revenue/profit (ROAS, break-even ROAS, POAS) and sales follow-through (board leads, close rate, cost per client) metrics. Each is judged Healthy / Watch / Below healthy against editable targets and healthy levels, with an account health score, cross-metric diagnosis (e.g. low CTR with cheap CPM = creative problem), per-campaign verdicts (Scale / Optimise / Fix or cut / Pause / Learning) and what to do for every slipping metric. “Preview with sample data” shows a made-up account without saving anything.
 
 ## Authentication and storage
 
